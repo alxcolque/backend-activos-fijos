@@ -1,0 +1,27 @@
+/docs/*
+/uploads/*
+/backups/*
+/logs/*
+
+# Dependencias y compilación
+node_modules
+dist
+coverage
+
+# Variables de entorno
+.env
+.env.production
+.env.*.local
+
+# Archivos estáticos y respaldos persistentes
+uploads/*
+!uploads/.gitkeep
+backups/*
+!backups/.gitkeep
+logs
+
+# IDEs & OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db

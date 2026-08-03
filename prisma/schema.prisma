@@ -1,0 +1,291 @@
+// Prisma Schema para Sistema de Gestión de Activos Fijos COMIBOL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------------------------
+// ENUMERACIONES
+// ------------------------------------------------------
+
+enum ProjectStatus {
+  ACTIVE
+  FINISHED
+  SUSPENDED
+  CANCELLED
+}
+
+enum ProjectType {
+  EXPLORATION
+  EXPLOITATION
+  ADMINISTRATIVE
+  OTHER
+}
+
+enum MaintenanceType {
+  PREVENTIVE
+  CORRECTIVE
+}
+
+enum InventoryStatus {
+  FOUND
+  NOT_FOUND
+  DAMAGED
+}
+
+enum DocumentType {
+  PHOTO
+  MANUAL
+  INVOICE
+  WARRANTY
+  REPORT
+  OTHER
+}
+
+// ------------------------------------------------------
+// MODELOS
+// ------------------------------------------------------
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  fullName  String
+  isActive  Boolean   @default(true)
+  lastLogin DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model AssetCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  assets Asset[]
+
+  @@map("asset_categories")
+}
+
+model AssetStatus {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  assets Asset[]
+
+  @@map("asset_statuses")
+}
+
+model Location {
+  id          String    @id @default(uuid())
+  parentId    String?
+  name        String
+  description String?   @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  parent   Location?  @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Location[] @relation("LocationHierarchy")
+
+  assets      Asset[]
+  inventories Inventory[]
+
+  @@index([parentId])
+  @@index([name])
+  @@map("locations")
+}
+
+model Project {
+  id          String        @id @default(uuid())
+  code        String        @unique
+  name        String        @unique
+  type        ProjectType   @default(ADMINISTRATIVE)
+  status      ProjectStatus @default(ACTIVE)
+  startDate   DateTime?
+  endDate     DateTime?
+  description String?       @db.Text
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
+
+  assetProjects AssetProject[]
+
+  @@index([code])
+  @@index([name])
+  @@index([status])
+  @@index([type])
+  @@map("projects")
+}
+
+model Asset {
+  id            String    @id @default(uuid())
+  code          String    @unique
+  qrCode        String?   @unique
+  name          String
+  description   String?   @db.Text
+  categoryId    String
+  statusId      String
+  locationId    String
+  brand         String?
+  model         String?
+  serialNumber  String?   @unique
+  unit          String?   @default("PZA")
+  quantity      Int       @default(1)
+  purchaseDate  DateTime?
+  purchaseYear  Int?
+  purchaseValue Decimal?  @db.Decimal(12, 2)
+  usefulLife    Int?
+  residualValue Decimal?  @db.Decimal(12, 2)
+  currentValue  Decimal?  @db.Decimal(12, 2)
+  observations  String?   @db.Text
+  photo         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  category AssetCategory @relation(fields: [categoryId], references: [id])
+  status   AssetStatus   @relation(fields: [statusId], references: [id])
+  location Location      @relation(fields: [locationId], references: [id])
+
+  assetProjects  AssetProject[]
+  assignments    AssetAssignment[]
+  documents      AssetDocument[]
+  maintenances   AssetMaintenance[]
+  inventoryItems InventoryItem[]
+
+  @@index([code])
+  @@index([qrCode])
+  @@index([serialNumber])
+  @@index([categoryId])
+  @@index([statusId])
+  @@index([locationId])
+  @@index([purchaseDate])
+  @@map("assets")
+}
+
+model AssetProject {
+  id           String    @id @default(uuid())
+  assetId      String
+  projectId    String
+  assignedAt   DateTime  @default(now())
+  releasedAt   DateTime?
+  observations String?   @db.Text
+
+  asset   Asset   @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([assetId])
+  @@index([projectId])
+  @@map("asset_projects")
+}
+
+model AssetAssignment {
+  id              String    @id @default(uuid())
+  assetId         String
+  responsibleName String
+  position        String?
+  assignedAt      DateTime  @default(now())
+  returnedAt      DateTime?
+  observations    String?   @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId])
+  @@map("asset_assignments")
+}
+
+model AssetDocument {
+  id           String       @id @default(uuid())
+  assetId      String
+  type         DocumentType @default(OTHER)
+  fileName     String
+  originalName String
+  mimeType     String
+  extension    String
+  size         Int
+  path         String
+  description  String?      @db.Text
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId])
+  @@map("asset_documents")
+}
+
+model AssetMaintenance {
+  id              String          @id @default(uuid())
+  assetId         String
+  type            MaintenanceType @default(PREVENTIVE)
+  maintenanceDate DateTime
+  provider        String?
+  cost            Decimal?        @db.Decimal(12, 2)
+  nextMaintenance DateTime?
+  observations    String?         @db.Text
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId])
+  @@map("asset_maintenances")
+}
+
+model Inventory {
+  id            String   @id @default(uuid())
+  name          String
+  inventoryDate DateTime
+  locationId    String
+  observations  String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  location Location        @relation(fields: [locationId], references: [id])
+  items    InventoryItem[]
+
+  @@map("inventories")
+}
+
+model InventoryItem {
+  id           String          @id @default(uuid())
+  inventoryId  String
+  assetId      String
+  status       InventoryStatus @default(FOUND)
+  observations String?         @db.Text
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  asset     Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([inventoryId])
+  @@index([assetId])
+  @@map("inventory_items")
+}
+
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String   @db.Text
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_settings")
+}

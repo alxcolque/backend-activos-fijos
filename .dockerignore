@@ -1,0 +1,12 @@
+node_modules
+dist
+docs
+.git
+.vscode
+coverage
+uploads
+backups
+.env
+.env.*
+README.md
+README_DEPLOY.md
