@@ -17,18 +17,15 @@ export class ProjectRepository implements IProjectRepository {
       deletedAt: null,
     };
 
-    if (options.type) {
-      whereCondition.type = options.type;
-    }
-
     if (options.status) {
       whereCondition.status = options.status;
     }
 
     if (options.search) {
       whereCondition.OR = [
-        { code: { contains: options.search } },
         { name: { contains: options.search } },
+        { address: { contains: options.search } },
+        { responsible: { contains: options.search } },
         { description: { contains: options.search } },
       ];
     }
@@ -45,9 +42,9 @@ export class ProjectRepository implements IProjectRepository {
         take: limit,
         select: {
           id: true,
-          code: true,
           name: true,
-          type: true,
+          address: true,
+          responsible: true,
           status: true,
           startDate: true,
           endDate: true,
@@ -66,9 +63,9 @@ export class ProjectRepository implements IProjectRepository {
 
     const formattedData: ProjectWithCount[] = projects.map((p) => ({
       id: p.id,
-      code: p.code,
       name: p.name,
-      type: p.type,
+      address: p.address,
+      responsible: p.responsible,
       status: p.status,
       startDate: p.startDate,
       endDate: p.endDate,
@@ -95,9 +92,9 @@ export class ProjectRepository implements IProjectRepository {
       where: { id, deletedAt: null },
       select: {
         id: true,
-        code: true,
         name: true,
-        type: true,
+        address: true,
+        responsible: true,
         status: true,
         startDate: true,
         endDate: true,
@@ -117,9 +114,9 @@ export class ProjectRepository implements IProjectRepository {
 
     return {
       id: p.id,
-      code: p.code,
       name: p.name,
-      type: p.type,
+      address: p.address,
+      responsible: p.responsible,
       status: p.status,
       startDate: p.startDate,
       endDate: p.endDate,
@@ -137,12 +134,6 @@ export class ProjectRepository implements IProjectRepository {
     });
   }
 
-  async findByCode(code: string): Promise<Project | null> {
-    return prisma.project.findFirst({
-      where: { code, deletedAt: null },
-    });
-  }
-
   async findByName(name: string): Promise<Project | null> {
     return prisma.project.findFirst({
       where: { name, deletedAt: null },
@@ -150,9 +141,9 @@ export class ProjectRepository implements IProjectRepository {
   }
 
   async create(data: {
-    code: string;
     name: string;
-    type?: any;
+    address?: string | null;
+    responsible?: string | null;
     status?: any;
     startDate?: Date | null;
     endDate?: Date | null;
@@ -160,9 +151,9 @@ export class ProjectRepository implements IProjectRepository {
   }): Promise<Project> {
     return prisma.project.create({
       data: {
-        code: data.code,
         name: data.name,
-        type: data.type || 'ADMINISTRATIVE',
+        address: data.address || null,
+        responsible: data.responsible || null,
         status: data.status || 'ACTIVE',
         startDate: data.startDate || null,
         endDate: data.endDate || null,
@@ -174,9 +165,9 @@ export class ProjectRepository implements IProjectRepository {
   async update(
     id: string,
     data: {
-      code?: string;
       name?: string;
-      type?: any;
+      address?: string | null;
+      responsible?: string | null;
       status?: any;
       startDate?: Date | null;
       endDate?: Date | null;
@@ -186,9 +177,9 @@ export class ProjectRepository implements IProjectRepository {
     return prisma.project.update({
       where: { id },
       data: {
-        ...(data.code !== undefined && { code: data.code }),
         ...(data.name !== undefined && { name: data.name }),
-        ...(data.type !== undefined && { type: data.type }),
+        ...(data.address !== undefined && { address: data.address }),
+        ...(data.responsible !== undefined && { responsible: data.responsible }),
         ...(data.status !== undefined && { status: data.status }),
         ...(data.startDate !== undefined && { startDate: data.startDate }),
         ...(data.endDate !== undefined && { endDate: data.endDate }),

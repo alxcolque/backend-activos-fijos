@@ -17,18 +17,13 @@ export async function projectRoutes(fastify: FastifyInstance) {
           properties: {
             page: { type: 'number', default: 1 },
             limit: { type: 'number', default: 20 },
-            search: { type: 'string', description: 'Filtro por código, nombre o descripción' },
-            type: {
-              type: 'string',
-              enum: ['EXPLORATION', 'EXPLOITATION', 'ADMINISTRATIVE', 'OTHER'],
-              description: 'Tipo de proyecto',
-            },
+            search: { type: 'string', description: 'Filtro por nombre, dirección, responsable o descripción' },
             status: {
               type: 'string',
               enum: ['ACTIVE', 'FINISHED', 'SUSPENDED', 'CANCELLED'],
               description: 'Estado del proyecto',
             },
-            sortBy: { type: 'string', enum: ['name', 'code', 'startDate', 'createdAt'], default: 'name' },
+            sortBy: { type: 'string', enum: ['name', 'startDate', 'createdAt'], default: 'name' },
             sortOrder: { type: 'string', enum: ['asc', 'desc'], default: 'asc' },
           },
         },
@@ -44,9 +39,9 @@ export async function projectRoutes(fastify: FastifyInstance) {
                   type: 'object',
                   properties: {
                     id: { type: 'string' },
-                    code: { type: 'string', example: 'PRY-001' },
                     name: { type: 'string', example: 'Proyecto Mesa Verde' },
-                    type: { type: 'string', example: 'EXPLOITATION' },
+                    address: { type: 'string', nullable: true, example: 'Av. 6 de Octubre #1234' },
+                    responsible: { type: 'string', nullable: true, example: 'Ing. Juan Pérez' },
                     status: { type: 'string', example: 'ACTIVE' },
                     startDate: { type: 'string', format: 'date-time', nullable: true },
                     endDate: { type: 'string', format: 'date-time', nullable: true },
@@ -99,9 +94,9 @@ export async function projectRoutes(fastify: FastifyInstance) {
                 type: 'object',
                 properties: {
                   id: { type: 'string' },
-                  code: { type: 'string' },
                   name: { type: 'string' },
-                  type: { type: 'string' },
+                  address: { type: 'string', nullable: true },
+                  responsible: { type: 'string', nullable: true },
                   status: { type: 'string' },
                   startDate: { type: 'string', format: 'date-time', nullable: true },
                   endDate: { type: 'string', format: 'date-time', nullable: true },
@@ -137,11 +132,11 @@ export async function projectRoutes(fastify: FastifyInstance) {
         security: [{ bearerAuth: [] }],
         body: {
           type: 'object',
-          required: ['code', 'name'],
+          required: ['name'],
           properties: {
-            code: { type: 'string', example: 'PRY-001' },
             name: { type: 'string', example: 'Proyecto Mesa Verde' },
-            type: { type: 'string', enum: ['EXPLORATION', 'EXPLOITATION', 'ADMINISTRATIVE', 'OTHER'], default: 'ADMINISTRATIVE' },
+            address: { type: 'string', nullable: true, example: 'Av. 6 de Octubre #1234' },
+            responsible: { type: 'string', nullable: true, example: 'Ing. Juan Pérez' },
             status: { type: 'string', enum: ['ACTIVE', 'FINISHED', 'SUSPENDED', 'CANCELLED'], default: 'ACTIVE' },
             startDate: { type: 'string', format: 'date', nullable: true, example: '2026-01-01' },
             endDate: { type: 'string', format: 'date', nullable: true },
@@ -158,9 +153,9 @@ export async function projectRoutes(fastify: FastifyInstance) {
                 type: 'object',
                 properties: {
                   id: { type: 'string' },
-                  code: { type: 'string' },
                   name: { type: 'string' },
-                  type: { type: 'string' },
+                  address: { type: 'string', nullable: true },
+                  responsible: { type: 'string', nullable: true },
                   status: { type: 'string' },
                   createdAt: { type: 'string', format: 'date-time' },
                   updatedAt: { type: 'string', format: 'date-time' },
@@ -181,107 +176,54 @@ export async function projectRoutes(fastify: FastifyInstance) {
     ProjectController.createProject,
   );
 
-  // Actualizar proyecto (PUT)
-  fastify.put(
-    '/:id',
-    {
-      onRequest: [authenticate],
-      schema: {
-        description: 'Actualizar un proyecto existente (PUT)',
-        tags: ['Proyectos'],
-        security: [{ bearerAuth: [] }],
-        params: {
-          type: 'object',
-          required: ['id'],
-          properties: {
-            id: { type: 'string' },
-          },
+  // Actualizar proyecto (PUT & PATCH)
+  const updateSchema = {
+    onRequest: [authenticate],
+    schema: {
+      description: 'Actualizar un proyecto existente',
+      tags: ['Proyectos'],
+      security: [{ bearerAuth: [] }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: { type: 'string' },
         },
-        body: {
+      },
+      body: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          address: { type: 'string', nullable: true },
+          responsible: { type: 'string', nullable: true },
+          status: { type: 'string', enum: ['ACTIVE', 'FINISHED', 'SUSPENDED', 'CANCELLED'] },
+          startDate: { type: 'string', format: 'date', nullable: true },
+          endDate: { type: 'string', format: 'date', nullable: true },
+          description: { type: 'string', nullable: true },
+        },
+      },
+      response: {
+        200: {
           type: 'object',
           properties: {
-            code: { type: 'string' },
-            name: { type: 'string' },
-            type: { type: 'string', enum: ['EXPLORATION', 'EXPLOITATION', 'ADMINISTRATIVE', 'OTHER'] },
-            status: { type: 'string', enum: ['ACTIVE', 'FINISHED', 'SUSPENDED', 'CANCELLED'] },
-            startDate: { type: 'string', format: 'date', nullable: true },
-            endDate: { type: 'string', format: 'date', nullable: true },
-            description: { type: 'string', nullable: true },
-          },
-        },
-        response: {
-          200: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean', example: true },
-              message: { type: 'string', example: 'Proyecto actualizado exitosamente.' },
-              data: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string' },
-                  code: { type: 'string' },
-                  name: { type: 'string' },
-                  updatedAt: { type: 'string', format: 'date-time' },
-                },
+            success: { type: 'boolean', example: true },
+            message: { type: 'string', example: 'Proyecto actualizado exitosamente.' },
+            data: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                name: { type: 'string' },
+                updatedAt: { type: 'string', format: 'date-time' },
               },
             },
           },
         },
       },
     },
-    ProjectController.updateProject,
-  );
+  };
 
-  // Actualizar proyecto (PATCH)
-  fastify.patch(
-    '/:id',
-    {
-      onRequest: [authenticate],
-      schema: {
-        description: 'Actualizar un proyecto existente (PATCH)',
-        tags: ['Proyectos'],
-        security: [{ bearerAuth: [] }],
-        params: {
-          type: 'object',
-          required: ['id'],
-          properties: {
-            id: { type: 'string' },
-          },
-        },
-        body: {
-          type: 'object',
-          properties: {
-            code: { type: 'string' },
-            name: { type: 'string' },
-            type: { type: 'string', enum: ['EXPLORATION', 'EXPLOITATION', 'ADMINISTRATIVE', 'OTHER'] },
-            status: { type: 'string', enum: ['ACTIVE', 'FINISHED', 'SUSPENDED', 'CANCELLED'] },
-            startDate: { type: 'string', format: 'date', nullable: true },
-            endDate: { type: 'string', format: 'date', nullable: true },
-            description: { type: 'string', nullable: true },
-          },
-        },
-        response: {
-          200: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean', example: true },
-              message: { type: 'string', example: 'Proyecto actualizado exitosamente.' },
-              data: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string' },
-                  code: { type: 'string' },
-                  name: { type: 'string' },
-                  updatedAt: { type: 'string', format: 'date-time' },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    ProjectController.updateProject,
-  );
+  fastify.put('/:id', updateSchema, ProjectController.updateProject);
+  fastify.patch('/:id', updateSchema, ProjectController.updateProject);
 
   // Eliminar proyecto (Soft Delete)
   fastify.delete(

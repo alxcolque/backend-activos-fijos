@@ -42,8 +42,14 @@ export const updateMaintenanceSchema = z.object({
 });
 
 export const queryMaintenanceSchema = z.object({
-  page: z.string().optional().transform((val) => (val ? parseInt(val, 10) : 1)),
-  limit: z.string().optional().transform((val) => (val ? parseInt(val, 10) : 20)),
+  page: z
+    .union([z.string(), z.number()])
+    .optional()
+    .transform((val) => (val != null ? Number(val) : 1)),
+  limit: z
+    .union([z.string(), z.number()])
+    .optional()
+    .transform((val) => (val != null ? Number(val) : 20)),
   search: z.string().optional(),
   type: z.nativeEnum(MaintenanceType).optional(),
   assetId: z.string().optional(),

@@ -47,9 +47,9 @@ export class AssetProjectRepository implements IAssetProjectRepository {
           project: {
             select: {
               id: true,
-              code: true,
               name: true,
-              type: true,
+              address: true,
+              responsible: true,
               status: true,
             },
           },
@@ -120,9 +120,9 @@ export class AssetProjectRepository implements IAssetProjectRepository {
         project: {
           select: {
             id: true,
-            code: true,
             name: true,
-            type: true,
+            address: true,
+            responsible: true,
             status: true,
           },
         },

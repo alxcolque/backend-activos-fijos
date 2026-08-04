@@ -22,8 +22,14 @@ export const registerInventoryItemSchema = z.object({
 });
 
 export const queryInventorySchema = z.object({
-  page: z.string().optional().transform((val) => (val ? parseInt(val, 10) : 1)),
-  limit: z.string().optional().transform((val) => (val ? parseInt(val, 10) : 20)),
+  page: z
+    .union([z.string(), z.number()])
+    .optional()
+    .transform((val) => (val != null ? Number(val) : 1)),
+  limit: z
+    .union([z.string(), z.number()])
+    .optional()
+    .transform((val) => (val != null ? Number(val) : 20)),
   search: z.string().optional(),
   locationId: z.string().optional(),
 });

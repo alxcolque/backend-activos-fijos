@@ -141,51 +141,50 @@ export async function categoryRoutes(fastify: FastifyInstance) {
     CategoryController.createCategory,
   );
 
-  // Actualizar categoría
-  fastify.patch(
-    '/:id',
-    {
-      onRequest: [authenticate],
-      schema: {
-        description: 'Actualizar una categoría existente',
-        tags: ['Categorías'],
-        security: [{ bearerAuth: [] }],
-        params: {
-          type: 'object',
-          required: ['id'],
-          properties: {
-            id: { type: 'string' },
-          },
+  // Actualizar categoría (soporta tanto PUT como PATCH)
+  const updateSchema = {
+    onRequest: [authenticate],
+    schema: {
+      description: 'Actualizar una categoría existente',
+      tags: ['Categorías'],
+      security: [{ bearerAuth: [] }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: { type: 'string' },
         },
-        body: {
+      },
+      body: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          description: { type: 'string' },
+        },
+      },
+      response: {
+        200: {
           type: 'object',
           properties: {
-            name: { type: 'string' },
-            description: { type: 'string' },
-          },
-        },
-        response: {
-          200: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean', example: true },
-              message: { type: 'string', example: 'Categoría actualizada exitosamente.' },
-              data: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string' },
-                  name: { type: 'string' },
-                  description: { type: 'string' },
-                  updatedAt: { type: 'string', format: 'date-time' },
-                },
+            success: { type: 'boolean', example: true },
+            message: { type: 'string', example: 'Categoría actualizada exitosamente.' },
+            data: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                name: { type: 'string' },
+                description: { type: 'string' },
+                updatedAt: { type: 'string', format: 'date-time' },
               },
             },
           },
         },
       },
     },
-    CategoryController.updateCategory,
-  );
+  };
+
+  fastify.put('/:id', updateSchema, CategoryController.updateCategory);
+  fastify.patch('/:id', updateSchema, CategoryController.updateCategory);
 
   // Eliminar categoría
   fastify.delete(

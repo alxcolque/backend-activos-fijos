@@ -1,4 +1,4 @@
-import { Project, ProjectType, ProjectStatus } from '@prisma/client';
+import { Project, ProjectStatus } from '@prisma/client';
 
 export interface ProjectWithCount extends Project {
   totalAssets?: number;
@@ -8,9 +8,8 @@ export interface FindAllProjectsOptions {
   page?: number;
   limit?: number;
   search?: string;
-  type?: ProjectType;
   status?: ProjectStatus;
-  sortBy?: 'name' | 'code' | 'startDate' | 'createdAt';
+  sortBy?: 'name' | 'startDate' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
 }
 
@@ -28,12 +27,11 @@ export interface IProjectRepository {
   findAll(options: FindAllProjectsOptions): Promise<PaginatedProjects>;
   findById(id: string): Promise<ProjectWithCount | null>;
   findRawById(id: string): Promise<Project | null>;
-  findByCode(code: string): Promise<Project | null>;
   findByName(name: string): Promise<Project | null>;
   create(data: {
-    code: string;
     name: string;
-    type?: ProjectType;
+    address?: string | null;
+    responsible?: string | null;
     status?: ProjectStatus;
     startDate?: Date | null;
     endDate?: Date | null;
@@ -42,9 +40,9 @@ export interface IProjectRepository {
   update(
     id: string,
     data: {
-      code?: string;
       name?: string;
-      type?: ProjectType;
+      address?: string | null;
+      responsible?: string | null;
       status?: ProjectStatus;
       startDate?: Date | null;
       endDate?: Date | null;

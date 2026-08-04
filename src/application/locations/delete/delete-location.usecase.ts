@@ -12,18 +12,18 @@ export class DeleteLocationUseCase {
       throw new NotFoundError('Ubicación no encontrada.');
     }
 
-    if (location.parentId === null || location.name.toUpperCase() === 'COMIBOL') {
-      throw new AppError('La ubicación raíz no puede eliminarse.', 400);
+    if (location.name.trim().toUpperCase() === 'COMIBOL') {
+      throw new AppError('La ubicación institucional COMIBOL no puede eliminarse.', 400);
     }
 
     const hasChildren = await this.locationRepository.existsChildren(id);
     if (hasChildren) {
-      throw new AppError('La ubicación tiene sububicaciones asociadas.', 400);
+      throw new AppError('La ubicación tiene sububicaciones asociadas. Elimine o reasigne sus sububicaciones primero.', 400);
     }
 
     const hasAssets = await this.locationRepository.existsAssets(id);
     if (hasAssets) {
-      throw new AppError('La ubicación posee activos asociados.', 400);
+      throw new AppError('La ubicación posee activos asociados. Reasigne o dé de baja sus activos primero.', 400);
     }
 
     await this.locationRepository.delete(id);

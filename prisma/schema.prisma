@@ -20,13 +20,6 @@ enum ProjectStatus {
   CANCELLED
 }
 
-enum ProjectType {
-  EXPLORATION
-  EXPLOITATION
-  ADMINISTRATIVE
-  OTHER
-}
-
 enum MaintenanceType {
   PREVENTIVE
   CORRECTIVE
@@ -110,9 +103,9 @@ model Location {
 
 model Project {
   id          String        @id @default(uuid())
-  code        String        @unique
   name        String        @unique
-  type        ProjectType   @default(ADMINISTRATIVE)
+  address     String?       @db.Text
+  responsible String?
   status      ProjectStatus @default(ACTIVE)
   startDate   DateTime?
   endDate     DateTime?
@@ -123,10 +116,8 @@ model Project {
 
   assetProjects AssetProject[]
 
-  @@index([code])
   @@index([name])
   @@index([status])
-  @@index([type])
   @@map("projects")
 }
 

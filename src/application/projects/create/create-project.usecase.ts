@@ -7,11 +7,6 @@ export class CreateProjectUseCase {
   constructor(private projectRepository: IProjectRepository) {}
 
   async execute(input: CreateProjectInput) {
-    const existingCode = await this.projectRepository.findByCode(input.code);
-    if (existingCode) {
-      throw new AppError('El código del proyecto ya existe.', 400);
-    }
-
     const existingName = await this.projectRepository.findByName(input.name);
     if (existingName) {
       throw new AppError('El nombre del proyecto ya existe.', 400);
@@ -25,16 +20,16 @@ export class CreateProjectUseCase {
     }
 
     const project = await this.projectRepository.create({
-      code: input.code,
       name: input.name,
-      type: input.type,
+      address: input.address,
+      responsible: input.responsible,
       status: input.status,
       startDate,
       endDate,
       description: input.description,
     });
 
-    logger.info({ projectId: project.id, code: project.code }, 'Proyecto creado exitosamente');
+    logger.info({ projectId: project.id, name: project.name }, 'Proyecto creado exitosamente');
 
     return project;
   }

@@ -21,11 +21,20 @@ export const releaseAssetSchema = z.object({
 });
 
 export const queryAssetProjectSchema = z.object({
-  page: z.string().optional().transform((val) => (val ? parseInt(val, 10) : 1)),
-  limit: z.string().optional().transform((val) => (val ? parseInt(val, 10) : 20)),
+  page: z
+    .union([z.string(), z.number()])
+    .optional()
+    .transform((val) => (val != null ? Number(val) : 1)),
+  limit: z
+    .union([z.string(), z.number()])
+    .optional()
+    .transform((val) => (val != null ? Number(val) : 20)),
   projectId: z.string().optional(),
   assetId: z.string().optional(),
-  activeOnly: z.string().optional().transform((val) => val === 'true'),
+  activeOnly: z
+    .union([z.string(), z.boolean()])
+    .optional()
+    .transform((val) => val === true || val === 'true'),
 });
 
 export type AssignAssetInput = z.infer<typeof assignAssetSchema>;

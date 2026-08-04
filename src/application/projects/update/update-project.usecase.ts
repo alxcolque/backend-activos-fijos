@@ -13,13 +13,6 @@ export class UpdateProjectUseCase {
       throw new NotFoundError('Proyecto no encontrado.');
     }
 
-    if (input.code && input.code !== currentProject.code) {
-      const existingCode = await this.projectRepository.findByCode(input.code);
-      if (existingCode && existingCode.id !== id) {
-        throw new AppError('El código del proyecto ya existe.', 400);
-      }
-    }
-
     if (input.name && input.name !== currentProject.name) {
       const existingName = await this.projectRepository.findByName(input.name);
       if (existingName && existingName.id !== id) {
@@ -27,7 +20,7 @@ export class UpdateProjectUseCase {
       }
     }
 
-    // State rule: Finished project cannot be set back to Active
+    // Regla de estado: Proyecto finalizado no puede reactivarse directamente
     if (currentProject.status === 'FINISHED' && input.status === 'ACTIVE') {
       throw new AppError('Un proyecto finalizado no puede volver al estado ACTIVO.', 400);
     }
@@ -51,9 +44,9 @@ export class UpdateProjectUseCase {
     }
 
     const updatedProject = await this.projectRepository.update(id, {
-      code: input.code,
       name: input.name,
-      type: input.type,
+      address: input.address,
+      responsible: input.responsible,
       status: input.status,
       startDate,
       endDate,

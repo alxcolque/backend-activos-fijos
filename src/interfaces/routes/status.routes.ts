@@ -141,51 +141,50 @@ export async function statusRoutes(fastify: FastifyInstance) {
     StatusController.createStatus,
   );
 
-  // Actualizar estado
-  fastify.patch(
-    '/:id',
-    {
-      onRequest: [authenticate],
-      schema: {
-        description: 'Actualizar un estado operativo existente',
-        tags: ['Estados Operativos'],
-        security: [{ bearerAuth: [] }],
-        params: {
-          type: 'object',
-          required: ['id'],
-          properties: {
-            id: { type: 'string' },
-          },
+  // Actualizar estado (soporta PUT y PATCH)
+  const updateSchema = {
+    onRequest: [authenticate],
+    schema: {
+      description: 'Actualizar un estado operativo existente',
+      tags: ['Estados Operativos'],
+      security: [{ bearerAuth: [] }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: { type: 'string' },
         },
-        body: {
+      },
+      body: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          description: { type: 'string' },
+        },
+      },
+      response: {
+        200: {
           type: 'object',
           properties: {
-            name: { type: 'string' },
-            description: { type: 'string' },
-          },
-        },
-        response: {
-          200: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean', example: true },
-              message: { type: 'string', example: 'Estado operativo actualizado exitosamente.' },
-              data: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string' },
-                  name: { type: 'string' },
-                  description: { type: 'string' },
-                  updatedAt: { type: 'string', format: 'date-time' },
-                },
+            success: { type: 'boolean', example: true },
+            message: { type: 'string', example: 'Estado operativo actualizado exitosamente.' },
+            data: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                name: { type: 'string' },
+                description: { type: 'string' },
+                updatedAt: { type: 'string', format: 'date-time' },
               },
             },
           },
         },
       },
     },
-    StatusController.updateStatus,
-  );
+  };
+
+  fastify.put('/:id', updateSchema, StatusController.updateStatus);
+  fastify.patch('/:id', updateSchema, StatusController.updateStatus);
 
   // Eliminar estado
   fastify.delete(
