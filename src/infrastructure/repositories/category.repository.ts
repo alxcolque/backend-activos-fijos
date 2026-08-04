@@ -23,6 +23,7 @@ export class CategoryRepository implements ICategoryRepository {
         id: true,
         name: true,
         description: true,
+        usefulLife: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -39,6 +40,7 @@ export class CategoryRepository implements ICategoryRepository {
       id: cat.id,
       name: cat.name,
       description: cat.description,
+      usefulLife: cat.usefulLife,
       createdAt: cat.createdAt,
       updatedAt: cat.updatedAt,
       totalAssets: cat._count.assets,
@@ -52,6 +54,7 @@ export class CategoryRepository implements ICategoryRepository {
         id: true,
         name: true,
         description: true,
+        usefulLife: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -70,6 +73,7 @@ export class CategoryRepository implements ICategoryRepository {
       id: cat.id,
       name: cat.name,
       description: cat.description,
+      usefulLife: cat.usefulLife,
       createdAt: cat.createdAt,
       updatedAt: cat.updatedAt,
       totalAssets: cat._count.assets,
@@ -82,19 +86,27 @@ export class CategoryRepository implements ICategoryRepository {
     });
   }
 
-  async create(data: { name: string; description?: string }): Promise<AssetCategory> {
+  async create(data: { name: string; description?: string; usefulLife?: number }): Promise<AssetCategory> {
     return prisma.assetCategory.create({
-      data,
+      data: {
+        name: data.name,
+        description: data.description || null,
+        usefulLife: data.usefulLife ?? 5,
+      },
     });
   }
 
   async update(
     id: string,
-    data: { name?: string; description?: string },
+    data: { name?: string; description?: string; usefulLife?: number },
   ): Promise<AssetCategory> {
     return prisma.assetCategory.update({
       where: { id },
-      data,
+      data: {
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.description !== undefined && { description: data.description }),
+        ...(data.usefulLife !== undefined && { usefulLife: data.usefulLife }),
+      },
     });
   }
 

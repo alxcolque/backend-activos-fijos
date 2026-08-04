@@ -32,6 +32,7 @@ export async function categoryRoutes(fastify: FastifyInstance) {
                     id: { type: 'string' },
                     name: { type: 'string', example: 'Maquinaria Pesada' },
                     description: { type: 'string', example: 'Equipos para minería' },
+                    usefulLife: { type: 'number', example: 10 },
                     totalAssets: { type: 'number', example: 12 },
                     createdAt: { type: 'string', format: 'date-time' },
                     updatedAt: { type: 'string', format: 'date-time' },
@@ -73,6 +74,7 @@ export async function categoryRoutes(fastify: FastifyInstance) {
                   id: { type: 'string' },
                   name: { type: 'string' },
                   description: { type: 'string' },
+                  usefulLife: { type: 'number' },
                   totalAssets: { type: 'number' },
                   createdAt: { type: 'string', format: 'date-time' },
                   updatedAt: { type: 'string', format: 'date-time' },
@@ -108,6 +110,7 @@ export async function categoryRoutes(fastify: FastifyInstance) {
           properties: {
             name: { type: 'string', example: 'Equipos de Computación' },
             description: { type: 'string', example: 'Servidores y laps' },
+            usefulLife: { type: 'number', example: 4 },
           },
         },
         response: {
@@ -122,6 +125,7 @@ export async function categoryRoutes(fastify: FastifyInstance) {
                   id: { type: 'string' },
                   name: { type: 'string' },
                   description: { type: 'string' },
+                  usefulLife: { type: 'number' },
                   createdAt: { type: 'string', format: 'date-time' },
                   updatedAt: { type: 'string', format: 'date-time' },
                 },
@@ -160,6 +164,7 @@ export async function categoryRoutes(fastify: FastifyInstance) {
         properties: {
           name: { type: 'string' },
           description: { type: 'string' },
+          usefulLife: { type: 'number' },
         },
       },
       response: {
@@ -174,6 +179,7 @@ export async function categoryRoutes(fastify: FastifyInstance) {
                 id: { type: 'string' },
                 name: { type: 'string' },
                 description: { type: 'string' },
+                usefulLife: { type: 'number' },
                 updatedAt: { type: 'string', format: 'date-time' },
               },
             },

@@ -36,10 +36,6 @@ export const createAssetSchema = z.object({
   purchaseValue: z
     .number({ required_error: 'El valor de compra es obligatorio.' })
     .gte(0, 'El valor de compra debe ser mayor o igual a cero.'),
-  usefulLife: z
-    .number({ required_error: 'La vida útil es obligatoria.' })
-    .int('La vida útil debe ser un número entero.')
-    .gt(0, 'La vida útil debe ser mayor a cero.'),
   residualValue: z
     .number()
     .gte(0, 'El valor residual debe ser mayor o igual a cero.')
@@ -87,11 +83,6 @@ export const updateAssetSchema = z.object({
   purchaseValue: z
     .number()
     .gte(0, 'El valor de compra debe ser mayor o igual a cero.')
-    .optional(),
-  usefulLife: z
-    .number()
-    .int('La vida útil debe ser un número entero.')
-    .gt(0, 'La vida útil debe ser mayor a cero.')
     .optional(),
   residualValue: z
     .number()

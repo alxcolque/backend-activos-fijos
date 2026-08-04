@@ -61,6 +61,7 @@ model AssetCategory {
   id          String   @id @default(uuid())
   name        String   @unique
   description String?  @db.Text
+  usefulLife  Int      @default(5)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -138,7 +139,6 @@ model Asset {
   purchaseDate  DateTime?
   purchaseYear  Int?
   purchaseValue Decimal?  @db.Decimal(12, 2)
-  usefulLife    Int?
   residualValue Decimal?  @db.Decimal(12, 2)
   currentValue  Decimal?  @db.Decimal(12, 2)
   observations  String?   @db.Text

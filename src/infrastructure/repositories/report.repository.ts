@@ -74,7 +74,7 @@ export class ReportRepository implements IReportRepository {
       where: whereCondition,
       orderBy: { code: 'asc' },
       include: {
-        category: { select: { name: true } },
+        category: { select: { name: true, usefulLife: true } },
       },
     });
 
@@ -84,7 +84,7 @@ export class ReportRepository implements IReportRepository {
 
     const items: DepreciationItem[] = assets.map((a) => {
       const purchaseValue = a.purchaseValue ? Number(a.purchaseValue) : 0;
-      const usefulLife = a.usefulLife && a.usefulLife > 0 ? a.usefulLife : 1;
+      const usefulLife = a.category?.usefulLife && a.category.usefulLife > 0 ? a.category.usefulLife : 5;
       const purchaseYear = a.purchaseYear || (a.purchaseDate ? new Date(a.purchaseDate).getFullYear() : targetYear);
 
       const elapsedYears = Math.max(0, targetYear - purchaseYear);

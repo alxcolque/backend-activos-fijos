@@ -203,7 +203,6 @@ export async function assetRoutes(fastify: FastifyInstance) {
             'locationId',
             'quantity',
             'purchaseValue',
-            'usefulLife',
           ],
           properties: {
             code: { type: 'string', example: 'AF-000001' },
@@ -220,7 +219,6 @@ export async function assetRoutes(fastify: FastifyInstance) {
             purchaseDate: { type: 'string', format: 'date', nullable: true, example: '2025-01-10' },
             purchaseYear: { type: 'number', nullable: true, example: 2025 },
             purchaseValue: { type: 'number', example: 350000 },
-            usefulLife: { type: 'number', example: 10 },
             residualValue: { type: 'number', nullable: true, example: 35000 },
             currentValue: { type: 'number', nullable: true, example: 350000 },
             observations: { type: 'string', nullable: true },

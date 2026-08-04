@@ -5,7 +5,7 @@ export interface AssetListItem {
   code: string;
   qrCode: string | null;
   name: string;
-  category: { id: string; name: string };
+  category: { id: string; name: string; usefulLife?: number };
   status: { id: string; name: string };
   location: { id: string; name: string };
   brand: string | null;
@@ -17,7 +17,7 @@ export interface AssetListItem {
 }
 
 export interface AssetDetail extends Asset {
-  category: { id: string; name: string };
+  category: { id: string; name: string; usefulLife?: number };
   status: { id: string; name: string };
   location: { id: string; name: string };
 }
@@ -59,7 +59,6 @@ export interface CreateAssetDto {
   purchaseDate?: Date | null;
   purchaseYear?: number | null;
   purchaseValue?: number | null;
-  usefulLife?: number | null;
   residualValue?: number | null;
   currentValue?: number | null;
   observations?: string | null;
@@ -81,7 +80,6 @@ export interface UpdateAssetDto {
   purchaseDate?: Date | null;
   purchaseYear?: number | null;
   purchaseValue?: number | null;
-  usefulLife?: number | null;
   residualValue?: number | null;
   currentValue?: number | null;
   observations?: string | null;

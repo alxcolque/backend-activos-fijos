@@ -65,7 +65,7 @@ export class AssetRepository implements IAssetRepository {
           currentValue: true,
           createdAt: true,
           category: {
-            select: { id: true, name: true },
+            select: { id: true, name: true, usefulLife: true },
           },
           status: {
             select: { id: true, name: true },
@@ -108,7 +108,7 @@ export class AssetRepository implements IAssetRepository {
     const asset = await prisma.asset.findFirst({
       where: { id, deletedAt: null },
       include: {
-        category: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true, usefulLife: true } },
         status: { select: { id: true, name: true } },
         location: { select: { id: true, name: true } },
       },
@@ -127,7 +127,7 @@ export class AssetRepository implements IAssetRepository {
     const asset = await prisma.asset.findFirst({
       where: { code, deletedAt: null },
       include: {
-        category: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true, usefulLife: true } },
         status: { select: { id: true, name: true } },
         location: { select: { id: true, name: true } },
       },
@@ -140,7 +140,7 @@ export class AssetRepository implements IAssetRepository {
     const asset = await prisma.asset.findFirst({
       where: { qrCode, deletedAt: null },
       include: {
-        category: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true, usefulLife: true } },
         status: { select: { id: true, name: true } },
         location: { select: { id: true, name: true } },
       },
@@ -175,7 +175,6 @@ export class AssetRepository implements IAssetRepository {
         purchaseDate: data.purchaseDate || null,
         purchaseYear: data.purchaseYear || null,
         purchaseValue: data.purchaseValue !== undefined ? data.purchaseValue : null,
-        usefulLife: data.usefulLife || null,
         residualValue: data.residualValue !== undefined ? data.residualValue : null,
         currentValue:
           data.currentValue !== undefined
@@ -207,7 +206,6 @@ export class AssetRepository implements IAssetRepository {
         ...(data.purchaseDate !== undefined && { purchaseDate: data.purchaseDate }),
         ...(data.purchaseYear !== undefined && { purchaseYear: data.purchaseYear }),
         ...(data.purchaseValue !== undefined && { purchaseValue: data.purchaseValue }),
-        ...(data.usefulLife !== undefined && { usefulLife: data.usefulLife }),
         ...(data.residualValue !== undefined && { residualValue: data.residualValue }),
         ...(data.currentValue !== undefined && { currentValue: data.currentValue }),
         ...(data.observations !== undefined && { observations: data.observations }),

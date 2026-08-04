@@ -53,7 +53,6 @@ export class CreateAssetUseCase {
       purchaseDate,
       purchaseYear: input.purchaseYear,
       purchaseValue: input.purchaseValue,
-      usefulLife: input.usefulLife,
       residualValue: input.residualValue,
       currentValue: input.currentValue ?? input.purchaseValue,
       observations: input.observations,
