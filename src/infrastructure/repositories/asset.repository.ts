@@ -10,6 +10,51 @@ import {
   UpdateAssetDto,
 } from '../../domain/assets/asset.repository.interface';
 
+const ASSET_YEAR = 360;
+
+export function calculateFinancials(
+  purchaseValueNum: number | null | undefined,
+  purchaseDateVal: Date | string | null | undefined,
+  usefulLifeVal: number | null | undefined,
+) {
+  const purchaseValue = purchaseValueNum ? Number(purchaseValueNum) : 0;
+  const avu = usefulLifeVal && Number(usefulLifeVal) > 0 ? Number(usefulLifeVal) : 5;
+
+  const dpd = 100 / (avu * ASSET_YEAR);
+  const dep = (dpd * purchaseValue / 100) * ASSET_YEAR;
+
+  let ndu = 0;
+  if (purchaseDateVal) {
+    const pDate = new Date(purchaseDateVal);
+    const now = new Date();
+    if (!isNaN(pDate.getTime()) && now > pDate) {
+      const diffTime = now.getTime() - pDate.getTime();
+      ndu = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    }
+  }
+
+  const au = ndu / ASSET_YEAR;
+
+  let depac = 0;
+  if (au >= avu) {
+    depac = Math.max(0, purchaseValue - 1);
+  } else {
+    depac = ((dpd * purchaseValue) / 100) * ndu;
+  }
+
+  if (depac > purchaseValue - 1 && purchaseValue > 0) {
+    depac = purchaseValue - 1;
+  }
+
+  const balance = Math.max(0, purchaseValue - depac);
+
+  return {
+    dep: Number(dep.toFixed(2)),
+    depac: Number(depac.toFixed(2)),
+    balance: Number(balance.toFixed(2)),
+  };
+}
+
 export class AssetRepository implements IAssetRepository {
   async findAll(options: FindAllAssetsOptions): Promise<PaginatedAssets> {
     const page = options.page && options.page > 0 ? options.page : 1;
@@ -58,9 +103,12 @@ export class AssetRepository implements IAssetRepository {
           code: true,
           qrCode: true,
           name: true,
+          quantity: true,
+          unit: true,
           brand: true,
           model: true,
           serialNumber: true,
+          purchaseDate: true,
           purchaseValue: true,
           currentValue: true,
           createdAt: true,
@@ -77,21 +125,33 @@ export class AssetRepository implements IAssetRepository {
       }),
     ]);
 
-    const formattedData: AssetListItem[] = assets.map((a) => ({
-      id: a.id,
-      code: a.code,
-      qrCode: a.qrCode,
-      name: a.name,
-      category: a.category,
-      status: a.status,
-      location: a.location,
-      brand: a.brand,
-      model: a.model,
-      serialNumber: a.serialNumber,
-      purchaseValue: a.purchaseValue ? Number(a.purchaseValue) : null,
-      currentValue: a.currentValue ? Number(a.currentValue) : null,
-      createdAt: a.createdAt,
-    }));
+    const formattedData: AssetListItem[] = assets.map((a) => {
+      const pVal = a.purchaseValue ? Number(a.purchaseValue) : 0;
+      const uLife = a.category?.usefulLife ?? 5;
+      const fin = calculateFinancials(pVal, a.purchaseDate, uLife);
+
+      return {
+        id: a.id,
+        code: a.code,
+        qrCode: a.qrCode,
+        name: a.name,
+        quantity: a.quantity ?? 1,
+        unit: a.unit || 'PZA',
+        category: a.category,
+        status: a.status,
+        location: a.location,
+        brand: a.brand,
+        model: a.model,
+        serialNumber: a.serialNumber,
+        purchaseDate: a.purchaseDate,
+        purchaseValue: pVal,
+        currentValue: a.currentValue ? Number(a.currentValue) : null,
+        dep: fin.dep,
+        depac: fin.depac,
+        balance: fin.balance,
+        createdAt: a.createdAt,
+      };
+    });
 
     return {
       data: formattedData,
@@ -114,7 +174,21 @@ export class AssetRepository implements IAssetRepository {
       },
     });
 
-    return asset as unknown as AssetDetail | null;
+    if (!asset) return null;
+
+    const pVal = asset.purchaseValue ? Number(asset.purchaseValue) : 0;
+    const uLife = asset.category?.usefulLife ?? 5;
+    const fin = calculateFinancials(pVal, asset.purchaseDate, uLife);
+
+    return {
+      ...asset,
+      purchaseValue: pVal as any,
+      currentValue: asset.currentValue ? (Number(asset.currentValue) as any) : null,
+      residualValue: asset.residualValue ? (Number(asset.residualValue) as any) : null,
+      dep: fin.dep,
+      depac: fin.depac,
+      balance: fin.balance,
+    } as AssetDetail;
   }
 
   async findRawById(id: string): Promise<Asset | null> {
@@ -133,7 +207,21 @@ export class AssetRepository implements IAssetRepository {
       },
     });
 
-    return asset as unknown as AssetDetail | null;
+    if (!asset) return null;
+
+    const pVal = asset.purchaseValue ? Number(asset.purchaseValue) : 0;
+    const uLife = asset.category?.usefulLife ?? 5;
+    const fin = calculateFinancials(pVal, asset.purchaseDate, uLife);
+
+    return {
+      ...asset,
+      purchaseValue: pVal as any,
+      currentValue: asset.currentValue ? (Number(asset.currentValue) as any) : null,
+      residualValue: asset.residualValue ? (Number(asset.residualValue) as any) : null,
+      dep: fin.dep,
+      depac: fin.depac,
+      balance: fin.balance,
+    } as AssetDetail;
   }
 
   async findByQr(qrCode: string): Promise<AssetDetail | null> {
@@ -146,7 +234,21 @@ export class AssetRepository implements IAssetRepository {
       },
     });
 
-    return asset as unknown as AssetDetail | null;
+    if (!asset) return null;
+
+    const pVal = asset.purchaseValue ? Number(asset.purchaseValue) : 0;
+    const uLife = asset.category?.usefulLife ?? 5;
+    const fin = calculateFinancials(pVal, asset.purchaseDate, uLife);
+
+    return {
+      ...asset,
+      purchaseValue: pVal as any,
+      currentValue: asset.currentValue ? (Number(asset.currentValue) as any) : null,
+      residualValue: asset.residualValue ? (Number(asset.residualValue) as any) : null,
+      dep: fin.dep,
+      depac: fin.depac,
+      balance: fin.balance,
+    } as AssetDetail;
   }
 
   async findBySerial(serialNumber: string): Promise<Asset | null> {

@@ -5,14 +5,20 @@ export interface AssetListItem {
   code: string;
   qrCode: string | null;
   name: string;
+  quantity: number;
+  unit: string | null;
   category: { id: string; name: string; usefulLife?: number };
   status: { id: string; name: string };
   location: { id: string; name: string };
   brand: string | null;
   model: string | null;
   serialNumber: string | null;
+  purchaseDate: Date | string | null;
   purchaseValue: number | null;
   currentValue: number | null;
+  dep: number;
+  depac: number;
+  balance: number;
   createdAt: Date;
 }
 
@@ -20,6 +26,9 @@ export interface AssetDetail extends Asset {
   category: { id: string; name: string; usefulLife?: number };
   status: { id: string; name: string };
   location: { id: string; name: string };
+  dep?: number;
+  depac?: number;
+  balance?: number;
 }
 
 export interface FindAllAssetsOptions {
