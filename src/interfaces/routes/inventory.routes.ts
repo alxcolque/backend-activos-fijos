@@ -28,7 +28,7 @@ export async function inventoryRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string', example: 'Campaña de inventario creada exitosamente.' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
           400: {
@@ -75,7 +75,7 @@ export async function inventoryRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string', example: 'Ítem de inventario registrado correctamente.' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
         },
@@ -135,7 +135,7 @@ export async function inventoryRoutes(fastify: FastifyInstance) {
             type: 'object',
             properties: {
               success: { type: 'boolean', example: true },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
           404: {

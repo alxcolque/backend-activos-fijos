@@ -64,7 +64,7 @@ export async function settingRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string', example: 'Configuración institucional actualizada exitosamente.' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
         },
@@ -94,7 +94,7 @@ export async function settingRoutes(fastify: FastifyInstance) {
             type: 'object',
             properties: {
               success: { type: 'boolean', example: true },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
         },
@@ -133,7 +133,7 @@ export async function settingRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
         },

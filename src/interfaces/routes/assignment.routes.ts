@@ -28,7 +28,7 @@ export async function assignmentRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string', example: 'Activo asignado al custodio exitosamente.' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
           400: {
@@ -67,7 +67,7 @@ export async function assignmentRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string', example: 'Devolución de activo registrada correctamente.' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
           400: {
@@ -134,7 +134,7 @@ export async function assignmentRoutes(fastify: FastifyInstance) {
             type: 'object',
             properties: {
               success: { type: 'boolean', example: true },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
           404: {

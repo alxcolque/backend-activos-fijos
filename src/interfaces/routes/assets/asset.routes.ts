@@ -24,7 +24,7 @@ export async function assetRoutes(fastify: FastifyInstance) {
             type: 'object',
             properties: {
               success: { type: 'boolean', example: true },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
           404: {
@@ -61,7 +61,7 @@ export async function assetRoutes(fastify: FastifyInstance) {
             type: 'object',
             properties: {
               success: { type: 'boolean', example: true },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
           404: {
@@ -174,7 +174,7 @@ export async function assetRoutes(fastify: FastifyInstance) {
             type: 'object',
             properties: {
               success: { type: 'boolean', example: true },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
           404: {
@@ -237,7 +237,7 @@ export async function assetRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string', example: 'Activo fijo creado exitosamente.' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
           400: {
@@ -276,7 +276,7 @@ export async function assetRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string', example: 'Activo fijo actualizado exitosamente.' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
         },
@@ -308,7 +308,7 @@ export async function assetRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string', example: 'Activo fijo actualizado exitosamente.' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
         },

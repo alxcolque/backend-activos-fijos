@@ -20,9 +20,13 @@ export function calculateFinancials(
   const purchaseValue = purchaseValueNum ? Number(purchaseValueNum) : 0;
   const avu = usefulLifeVal && Number(usefulLifeVal) > 0 ? Number(usefulLifeVal) : 5;
 
+  // dpd = 100 / (avu * ASSET_YEAR)
   const dpd = 100 / (avu * ASSET_YEAR);
-  const dep = (dpd * purchaseValue / 100) * ASSET_YEAR;
 
+  // dep = (dpd) * ASSET_YEAR (monto de depreciación anual sobre valor de compra)
+  const dep = ((dpd * purchaseValue) / 100) * ASSET_YEAR;
+
+  // ndu = Fecha Actual - purchaseDate (en días)
   let ndu = 0;
   if (purchaseDateVal) {
     const pDate = new Date(purchaseDateVal);
@@ -33,19 +37,23 @@ export function calculateFinancials(
     }
   }
 
+  // au = ndu / ASSET_YEAR
   const au = ndu / ASSET_YEAR;
 
+  // si (au >= avu) entonces depac = purchaseValue - 1 sino depac = ((dpd * purchaseValue)/100) * ndu
   let depac = 0;
-  if (au >= avu) {
-    depac = Math.max(0, purchaseValue - 1);
-  } else {
-    depac = ((dpd * purchaseValue) / 100) * ndu;
+  if (purchaseValue > 0) {
+    if (au >= avu) {
+      depac = purchaseValue - 1;
+    } else {
+      depac = ((dpd * purchaseValue) / 100) * ndu;
+      if (depac > purchaseValue - 1) {
+        depac = purchaseValue - 1;
+      }
+    }
   }
 
-  if (depac > purchaseValue - 1 && purchaseValue > 0) {
-    depac = purchaseValue - 1;
-  }
-
+  // balance = purchaseValue - depac
   const balance = Math.max(0, purchaseValue - depac);
 
   return {

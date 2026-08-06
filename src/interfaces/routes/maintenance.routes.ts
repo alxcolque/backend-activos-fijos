@@ -31,7 +31,7 @@ export async function maintenanceRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string', example: 'Mantenimiento registrado exitosamente.' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
           400: {
@@ -104,7 +104,7 @@ export async function maintenanceRoutes(fastify: FastifyInstance) {
             type: 'object',
             properties: {
               success: { type: 'boolean', example: true },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
           404: {
@@ -143,7 +143,7 @@ export async function maintenanceRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string', example: 'Mantenimiento actualizado exitosamente.' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
         },
@@ -175,7 +175,7 @@ export async function maintenanceRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string', example: 'Mantenimiento actualizado exitosamente.' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
         },

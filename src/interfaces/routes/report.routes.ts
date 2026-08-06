@@ -28,7 +28,7 @@ export async function reportRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
         },
@@ -59,7 +59,7 @@ export async function reportRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
         },
@@ -90,7 +90,7 @@ export async function reportRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
         },
@@ -122,7 +122,7 @@ export async function reportRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string' },
-              data: { type: 'object' },
+              data: { type: 'object', additionalProperties: true },
             },
           },
         },
