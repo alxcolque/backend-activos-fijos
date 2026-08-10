@@ -10,14 +10,23 @@ async function startServer() {
     // Conectar a la base de datos (si la DB está disponible)
     await prisma.connect();
 
-    await app.listen({
-      port: env.PORT,
-      host: '0.0.0.0',
-    });
+    const rawPort = process.env.PORT || env.PORT;
+    const isSocket = isNaN(Number(rawPort));
 
-    logger.info(`🚀 Servidor ejecutándose en http://localhost:${env.PORT}`);
-    logger.info(`📚 Documentación Swagger disponible en http://localhost:${env.PORT}/docs`);
-    logger.info(`❤️ Health Check disponible en http://localhost:${env.PORT}/api/v1/health`);
+    if (isSocket) {
+      await app.listen({ path: rawPort });
+      logger.info(`🚀 Servidor ejecutándose en Socket Passenger: ${rawPort}`);
+    } else {
+      const portNum = Number(rawPort);
+      await app.listen({
+        port: portNum,
+        host: '0.0.0.0',
+      });
+      logger.info(`🚀 Servidor ejecutándose en puerto: ${portNum}`);
+    }
+
+    logger.info(`📚 Documentación Swagger disponible en /docs`);
+    logger.info(`❤️ Health Check disponible en /api/v1/health`);
   } catch (error) {
     logger.error({ error }, 'Error al iniciar el servidor');
     process.exit(1);
