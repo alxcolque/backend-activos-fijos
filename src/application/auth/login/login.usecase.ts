@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { IAuthRepository } from '../../../domain/auth/auth.repository.interface';
 import { LoginInput } from '../../../interfaces/validators/auth/auth.validator';
