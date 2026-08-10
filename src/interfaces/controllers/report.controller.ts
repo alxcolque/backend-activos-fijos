@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { ReportRepository } from '../../infrastructure/repositories/report.repository';
+import { RepositoryFactory } from '../../infrastructure/database/repository.factory';
 import { GetAssetsReportUseCase } from '../../application/reports/get-assets-report/get-assets-report.usecase';
 import { GetDepreciationReportUseCase } from '../../application/reports/get-depreciation-report/get-depreciation-report.usecase';
 import { GetAssignmentsReportUseCase } from '../../application/reports/get-assignments-report/get-assignments-report.usecase';
@@ -7,7 +7,7 @@ import { GetMaintenancesReportUseCase } from '../../application/reports/get-main
 import { reportQuerySchema } from '../validators/reports/report.validator';
 import { successResponse } from '../../shared/utils/response.util';
 
-const repository = new ReportRepository();
+const repository = RepositoryFactory.getReportRepository();
 const getAssetsReportUseCase = new GetAssetsReportUseCase(repository);
 const getDepreciationReportUseCase = new GetDepreciationReportUseCase(repository);
 const getAssignmentsReportUseCase = new GetAssignmentsReportUseCase(repository);

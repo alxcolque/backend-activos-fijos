@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DocumentType } from '@prisma/client';
+import { DocumentType } from '../../../domain/enums/document-type.enum';
 
 export const createDocumentSchema = z.object({
   assetId: z

@@ -1,4 +1,5 @@
-import { AssetDocument, DocumentType } from '@prisma/client';
+import { AssetDocument } from './document.entity';
+import { DocumentType } from '../enums/document-type.enum';
 
 export interface AssetDocumentDetail extends AssetDocument {
   asset?: {

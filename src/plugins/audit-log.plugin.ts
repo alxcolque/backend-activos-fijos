@@ -1,8 +1,8 @@
 import { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
-import { AuditLogRepository } from '../infrastructure/repositories/audit-log.repository';
+import { RepositoryFactory } from '../infrastructure/database/repository.factory';
 
-const repository = new AuditLogRepository();
+const repository = RepositoryFactory.getAuditLogRepository();
 
 export const registerAuditLogPlugin = fp(async (fastify: FastifyInstance) => {
   fastify.addHook('onRequest', async (request) => {

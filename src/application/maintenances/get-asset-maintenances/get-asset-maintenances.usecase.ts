@@ -1,4 +1,4 @@
-import { MaintenanceType } from '@prisma/client';
+import { MaintenanceType } from '../../../domain/enums/maintenance-type.enum';
 import { IMaintenanceRepository } from '../../../domain/maintenances/maintenance.repository.interface';
 import { NotFoundError } from '../../../shared/errors/app-error';
 

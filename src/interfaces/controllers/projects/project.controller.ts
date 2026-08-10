@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { ProjectRepository } from '../../../infrastructure/repositories/project.repository';
+import { RepositoryFactory } from '../../../infrastructure/database/repository.factory';
 import { GetProjectsUseCase } from '../../../application/projects/getAll/get-projects.usecase';
 import { GetProjectUseCase } from '../../../application/projects/get/get-project.usecase';
 import { CreateProjectUseCase } from '../../../application/projects/create/create-project.usecase';
@@ -12,7 +12,7 @@ import {
 } from '../../validators/projects/project.validator';
 import { successResponse } from '../../../shared/utils/response.util';
 
-const projectRepository = new ProjectRepository();
+const projectRepository = RepositoryFactory.getProjectRepository();
 const getProjectsUseCase = new GetProjectsUseCase(projectRepository);
 const getProjectUseCase = new GetProjectUseCase(projectRepository);
 const createProjectUseCase = new CreateProjectUseCase(projectRepository);

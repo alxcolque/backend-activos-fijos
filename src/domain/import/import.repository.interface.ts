@@ -1,4 +1,4 @@
-import { Asset } from '@prisma/client';
+import { Asset } from '../assets/asset.entity';
 
 export interface ImportRow {
   code: string;

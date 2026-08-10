@@ -1,4 +1,4 @@
-import { AssetAssignment } from '@prisma/client';
+import { AssetAssignment } from './assignment.entity';
 
 export interface AssetAssignmentDetail extends AssetAssignment {
   asset?: {

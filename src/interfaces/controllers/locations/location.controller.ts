@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { LocationRepository } from '../../../infrastructure/repositories/location.repository';
+import { RepositoryFactory } from '../../../infrastructure/database/repository.factory';
 import { GetLocationsUseCase } from '../../../application/locations/getAll/get-locations.usecase';
 import { GetLocationUseCase } from '../../../application/locations/get/get-location.usecase';
 import { GetTreeUseCase } from '../../../application/locations/getTree/get-tree.usecase';
@@ -13,7 +13,7 @@ import {
 } from '../../validators/locations/location.validator';
 import { successResponse } from '../../../shared/utils/response.util';
 
-const locationRepository = new LocationRepository();
+const locationRepository = RepositoryFactory.getLocationRepository();
 const getLocationsUseCase = new GetLocationsUseCase(locationRepository);
 const getLocationUseCase = new GetLocationUseCase(locationRepository);
 const getTreeUseCase = new GetTreeUseCase(locationRepository);

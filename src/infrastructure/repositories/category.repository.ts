@@ -1,4 +1,4 @@
-import { AssetCategory } from '@prisma/client';
+import { AssetCategory } from '../../domain/category/category.entity';
 import { prisma } from '../database/prisma.service';
 import {
   ICategoryRepository,

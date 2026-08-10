@@ -1,9 +1,9 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { DashboardRepository } from '../../infrastructure/repositories/dashboard.repository';
+import { RepositoryFactory } from '../../infrastructure/database/repository.factory';
 import { GetDashboardUseCase } from '../../application/dashboard/get-dashboard/get-dashboard.usecase';
 import { successResponse } from '../../shared/utils/response.util';
 
-const dashboardRepository = new DashboardRepository();
+const dashboardRepository = RepositoryFactory.getDashboardRepository();
 const getDashboardUseCase = new GetDashboardUseCase(dashboardRepository);
 
 export class DashboardController {

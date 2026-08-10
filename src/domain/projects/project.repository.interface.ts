@@ -1,4 +1,5 @@
-import { Project, ProjectStatus } from '@prisma/client';
+import { Project } from './project.entity';
+import { ProjectStatus } from '../enums/project-status.enum';
 
 export interface ProjectWithCount extends Project {
   totalAssets?: number;

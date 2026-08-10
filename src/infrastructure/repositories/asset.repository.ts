@@ -1,4 +1,4 @@
-import { Asset } from '@prisma/client';
+import { Asset } from '../../domain/assets/asset.entity';
 import { prisma } from '../database/prisma.service';
 import {
   IAssetRepository,
@@ -216,9 +216,10 @@ export class AssetRepository implements IAssetRepository {
   }
 
   async findRawById(id: string): Promise<Asset | null> {
-    return prisma.asset.findFirst({
+    const item = await prisma.asset.findFirst({
       where: { id, deletedAt: null },
     });
+    return item as unknown as Asset | null;
   }
 
   async findByCode(code: string): Promise<AssetDetail | null> {
@@ -276,15 +277,16 @@ export class AssetRepository implements IAssetRepository {
   }
 
   async findBySerial(serialNumber: string): Promise<Asset | null> {
-    return prisma.asset.findFirst({
+    const item = await prisma.asset.findFirst({
       where: { serialNumber, deletedAt: null },
     });
+    return item as unknown as Asset | null;
   }
 
   async create(data: CreateAssetDto): Promise<Asset> {
     const qrCode = data.qrCode || data.code;
 
-    return prisma.asset.create({
+    const item = await prisma.asset.create({
       data: {
         code: data.code,
         qrCode,
@@ -312,10 +314,11 @@ export class AssetRepository implements IAssetRepository {
         photo: data.photo || null,
       },
     });
+    return item as unknown as Asset;
   }
 
   async update(id: string, data: UpdateAssetDto): Promise<Asset> {
-    return prisma.asset.update({
+    const item = await prisma.asset.update({
       where: { id },
       data: {
         ...(data.code !== undefined && { code: data.code, qrCode: data.code }),
@@ -338,6 +341,7 @@ export class AssetRepository implements IAssetRepository {
         ...(data.photo !== undefined && { photo: data.photo }),
       },
     });
+    return item as unknown as Asset;
   }
 
   async delete(id: string): Promise<void> {

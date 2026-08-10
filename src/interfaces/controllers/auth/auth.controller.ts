@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { AuthRepository } from '../../../infrastructure/repositories/auth.repository';
+import { RepositoryFactory } from '../../../infrastructure/database/repository.factory';
 import { LoginUseCase } from '../../../application/auth/login/login.usecase';
 import { ProfileUseCase } from '../../../application/auth/profile/profile.usecase';
 import { RefreshTokenUseCase } from '../../../application/auth/refresh/refresh.usecase';
@@ -7,7 +7,7 @@ import { LogoutUseCase } from '../../../application/auth/logout/logout.usecase';
 import { loginSchema, refreshSchema } from '../../validators/auth/auth.validator';
 import { successResponse } from '../../../shared/utils/response.util';
 
-const authRepository = new AuthRepository();
+const authRepository = RepositoryFactory.getAuthRepository();
 const loginUseCase = new LoginUseCase(authRepository);
 const profileUseCase = new ProfileUseCase(authRepository);
 const refreshTokenUseCase = new RefreshTokenUseCase(authRepository);

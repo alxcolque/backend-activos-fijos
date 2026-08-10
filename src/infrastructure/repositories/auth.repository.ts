@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { User } from '../../domain/auth/user.entity';
 import { prisma } from '../database/prisma.service';
 import { IAuthRepository } from '../../domain/auth/auth.repository.interface';
 

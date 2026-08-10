@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { DocumentRepository } from '../../infrastructure/repositories/document.repository';
+import { RepositoryFactory } from '../../infrastructure/database/repository.factory';
 import { CreateDocumentUseCase } from '../../application/documents/create-document/create-document.usecase';
 import { DeleteDocumentUseCase } from '../../application/documents/delete-document/delete-document.usecase';
 import { GetAssetDocumentsUseCase } from '../../application/documents/get-asset-documents/get-asset-documents.usecase';
@@ -10,9 +10,9 @@ import {
   queryDocumentSchema,
 } from '../validators/documents/document.validator';
 import { successResponse } from '../../shared/utils/response.util';
-import { DocumentType } from '@prisma/client';
+import { DocumentType } from '../../domain/enums/document-type.enum';
 
-const repository = new DocumentRepository();
+const repository = RepositoryFactory.getDocumentRepository();
 const createDocumentUseCase = new CreateDocumentUseCase(repository);
 const deleteDocumentUseCase = new DeleteDocumentUseCase(repository);
 const getAssetDocumentsUseCase = new GetAssetDocumentsUseCase(repository);

@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { AssignmentRepository } from '../../infrastructure/repositories/assignment.repository';
+import { RepositoryFactory } from '../../infrastructure/database/repository.factory';
 import { AssignCustodianUseCase } from '../../application/assignments/assign-custodian/assign-custodian.usecase';
 import { ReturnAssetUseCase } from '../../application/assignments/return-asset/return-asset.usecase';
 import { GetAssetCustodiansUseCase } from '../../application/assignments/get-asset-custodians/get-asset-custodians.usecase';
@@ -12,7 +12,7 @@ import {
 } from '../validators/assignments/assignment.validator';
 import { successResponse } from '../../shared/utils/response.util';
 
-const repository = new AssignmentRepository();
+const repository = RepositoryFactory.getAssignmentRepository();
 const assignCustodianUseCase = new AssignCustodianUseCase(repository);
 const returnAssetUseCase = new ReturnAssetUseCase(repository);
 const getAssetCustodiansUseCase = new GetAssetCustodiansUseCase(repository);

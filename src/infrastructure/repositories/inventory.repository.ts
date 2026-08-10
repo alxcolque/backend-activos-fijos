@@ -1,4 +1,5 @@
-import { Inventory, InventoryItem, InventoryStatus } from '@prisma/client';
+import { Inventory, InventoryItem } from '../../domain/inventories/inventory.entity';
+import { InventoryStatus } from '../../domain/enums/inventory-status.enum';
 import { prisma } from '../database/prisma.service';
 import {
   IInventoryRepository,
@@ -114,9 +115,10 @@ export class InventoryRepository implements IInventoryRepository {
   }
 
   async findItemByInventoryAndAsset(inventoryId: string, assetId: string): Promise<InventoryItem | null> {
-    return prisma.inventoryItem.findFirst({
+    const item = await prisma.inventoryItem.findFirst({
       where: { inventoryId, assetId },
     });
+    return item as unknown as InventoryItem | null;
   }
 
   async findItemsByInventoryId(inventoryId: string): Promise<InventoryItemDetail[]> {
@@ -140,7 +142,7 @@ export class InventoryRepository implements IInventoryRepository {
   }
 
   async create(data: CreateInventoryDto): Promise<Inventory> {
-    return prisma.inventory.create({
+    const item = await prisma.inventory.create({
       data: {
         name: data.name,
         inventoryDate: data.inventoryDate,
@@ -148,29 +150,32 @@ export class InventoryRepository implements IInventoryRepository {
         observations: data.observations || null,
       },
     });
+    return item as unknown as Inventory;
   }
 
   async registerItem(data: RegisterInventoryItemDto): Promise<InventoryItem> {
     const existing = await this.findItemByInventoryAndAsset(data.inventoryId, data.assetId);
 
     if (existing) {
-      return prisma.inventoryItem.update({
+      const updated = await prisma.inventoryItem.update({
         where: { id: existing.id },
         data: {
-          status: data.status || 'FOUND',
+          status: (data.status as any) || 'FOUND',
           observations: data.observations || null,
         },
       });
+      return updated as unknown as InventoryItem;
     }
 
-    return prisma.inventoryItem.create({
+    const created = await prisma.inventoryItem.create({
       data: {
         inventoryId: data.inventoryId,
         assetId: data.assetId,
-        status: data.status || 'FOUND',
+        status: (data.status as any) || 'FOUND',
         observations: data.observations || null,
       },
     });
+    return created as unknown as InventoryItem;
   }
 
   async delete(id: string): Promise<void> {

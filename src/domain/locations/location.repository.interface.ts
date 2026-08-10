@@ -1,4 +1,4 @@
-import { Location } from '@prisma/client';
+import { Location } from './location.entity';
 
 export interface LocationTreeNode {
   id: string;

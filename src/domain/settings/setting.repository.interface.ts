@@ -1,4 +1,4 @@
-import { SystemSetting } from '@prisma/client';
+import { SystemSetting } from './setting.entity';
 
 export interface CompanySettings {
   companyName: string;

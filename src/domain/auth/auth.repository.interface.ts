@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { User } from './user.entity';
 
 export interface IAuthRepository {
   findByEmail(email: string): Promise<User | null>;

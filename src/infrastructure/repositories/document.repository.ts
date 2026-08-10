@@ -1,4 +1,5 @@
-import { AssetDocument, DocumentType } from '@prisma/client';
+import { AssetDocument } from '../../domain/documents/document.entity';
+import { DocumentType } from '../../domain/enums/document-type.enum';
 import { prisma } from '../database/prisma.service';
 import {
   IDocumentRepository,
@@ -87,17 +88,18 @@ export class DocumentRepository implements IDocumentRepository {
       whereCondition.type = type;
     }
 
-    return prisma.assetDocument.findMany({
+    const items = await prisma.assetDocument.findMany({
       where: whereCondition,
       orderBy: { createdAt: 'desc' },
     });
+    return items as unknown as AssetDocument[];
   }
 
   async create(data: CreateDocumentDto): Promise<AssetDocument> {
-    return prisma.assetDocument.create({
+    const item = await prisma.assetDocument.create({
       data: {
         assetId: data.assetId,
-        type: data.type || 'OTHER',
+        type: (data.type as any) || 'OTHER',
         fileName: data.fileName,
         originalName: data.originalName,
         mimeType: data.mimeType,
@@ -107,6 +109,7 @@ export class DocumentRepository implements IDocumentRepository {
         description: data.description || null,
       },
     });
+    return item as unknown as AssetDocument;
   }
 
   async delete(id: string): Promise<void> {

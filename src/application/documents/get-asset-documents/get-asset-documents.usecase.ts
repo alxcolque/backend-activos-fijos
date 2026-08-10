@@ -1,4 +1,4 @@
-import { DocumentType } from '@prisma/client';
+import { DocumentType } from '../../../domain/enums/document-type.enum';
 import { IDocumentRepository } from '../../../domain/documents/document.repository.interface';
 import { NotFoundError } from '../../../shared/errors/app-error';
 

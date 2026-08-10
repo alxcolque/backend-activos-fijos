@@ -1,4 +1,4 @@
-import { Project } from '@prisma/client';
+import { Project } from '../../domain/projects/project.entity';
 import { prisma } from '../database/prisma.service';
 import {
   IProjectRepository,
@@ -66,7 +66,7 @@ export class ProjectRepository implements IProjectRepository {
       name: p.name,
       address: p.address,
       responsible: p.responsible,
-      status: p.status,
+      status: p.status as any,
       startDate: p.startDate,
       endDate: p.endDate,
       description: p.description,
@@ -117,7 +117,7 @@ export class ProjectRepository implements IProjectRepository {
       name: p.name,
       address: p.address,
       responsible: p.responsible,
-      status: p.status,
+      status: p.status as any,
       startDate: p.startDate,
       endDate: p.endDate,
       description: p.description,
@@ -129,15 +129,17 @@ export class ProjectRepository implements IProjectRepository {
   }
 
   async findRawById(id: string): Promise<Project | null> {
-    return prisma.project.findFirst({
+    const item = await prisma.project.findFirst({
       where: { id, deletedAt: null },
     });
+    return item as unknown as Project | null;
   }
 
   async findByName(name: string): Promise<Project | null> {
-    return prisma.project.findFirst({
+    const item = await prisma.project.findFirst({
       where: { name, deletedAt: null },
     });
+    return item as unknown as Project | null;
   }
 
   async create(data: {
@@ -149,7 +151,7 @@ export class ProjectRepository implements IProjectRepository {
     endDate?: Date | null;
     description?: string | null;
   }): Promise<Project> {
-    return prisma.project.create({
+    const item = await prisma.project.create({
       data: {
         name: data.name,
         address: data.address || null,
@@ -160,6 +162,7 @@ export class ProjectRepository implements IProjectRepository {
         description: data.description || null,
       },
     });
+    return item as unknown as Project;
   }
 
   async update(
@@ -174,7 +177,7 @@ export class ProjectRepository implements IProjectRepository {
       description?: string | null;
     },
   ): Promise<Project> {
-    return prisma.project.update({
+    const item = await prisma.project.update({
       where: { id },
       data: {
         ...(data.name !== undefined && { name: data.name }),
@@ -186,6 +189,7 @@ export class ProjectRepository implements IProjectRepository {
         ...(data.description !== undefined && { description: data.description }),
       },
     });
+    return item as unknown as Project;
   }
 
   async delete(id: string): Promise<void> {

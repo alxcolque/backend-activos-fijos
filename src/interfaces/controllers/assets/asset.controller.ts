@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { AssetRepository } from '../../../infrastructure/repositories/asset.repository';
+import { RepositoryFactory } from '../../../infrastructure/database/repository.factory';
 import { GetAssetsUseCase } from '../../../application/assets/getAll/get-assets.usecase';
 import { GetAssetUseCase } from '../../../application/assets/get/get-asset.usecase';
 import { GetAssetByCodeUseCase } from '../../../application/assets/getByCode/get-asset-by-code.usecase';
@@ -14,7 +14,7 @@ import {
 } from '../../validators/assets/asset.validator';
 import { successResponse } from '../../../shared/utils/response.util';
 
-const assetRepository = new AssetRepository();
+const assetRepository = RepositoryFactory.getAssetRepository();
 const getAssetsUseCase = new GetAssetsUseCase(assetRepository);
 const getAssetUseCase = new GetAssetUseCase(assetRepository);
 const getAssetByCodeUseCase = new GetAssetByCodeUseCase(assetRepository);

@@ -1,4 +1,4 @@
-import { AssetAssignment } from '@prisma/client';
+import { AssetAssignment } from '../../domain/assignments/assignment.entity';
 import { prisma } from '../database/prisma.service';
 import {
   IAssignmentRepository,

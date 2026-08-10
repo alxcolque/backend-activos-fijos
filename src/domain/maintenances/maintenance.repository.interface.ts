@@ -1,4 +1,5 @@
-import { AssetMaintenance, MaintenanceType } from '@prisma/client';
+import { AssetMaintenance } from './maintenance.entity';
+import { MaintenanceType } from '../enums/maintenance-type.enum';
 
 export interface AssetMaintenanceDetail extends AssetMaintenance {
   asset?: {

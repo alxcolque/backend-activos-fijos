@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { InventoryStatus } from '@prisma/client';
+import { InventoryStatus } from '../../../domain/enums/inventory-status.enum';
 
 export const createInventorySchema = z.object({
   name: z

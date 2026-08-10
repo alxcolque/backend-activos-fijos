@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { MaintenanceRepository } from '../../infrastructure/repositories/maintenance.repository';
+import { RepositoryFactory } from '../../infrastructure/database/repository.factory';
 import { CreateMaintenanceUseCase } from '../../application/maintenances/create-maintenance/create-maintenance.usecase';
 import { UpdateMaintenanceUseCase } from '../../application/maintenances/update-maintenance/update-maintenance.usecase';
 import { DeleteMaintenanceUseCase } from '../../application/maintenances/delete-maintenance/delete-maintenance.usecase';
@@ -12,9 +12,9 @@ import {
   queryMaintenanceSchema,
 } from '../validators/maintenances/maintenance.validator';
 import { successResponse } from '../../shared/utils/response.util';
-import { MaintenanceType } from '@prisma/client';
+import { MaintenanceType } from '../../domain/enums/maintenance-type.enum';
 
-const repository = new MaintenanceRepository();
+const repository = RepositoryFactory.getMaintenanceRepository();
 const createMaintenanceUseCase = new CreateMaintenanceUseCase(repository);
 const updateMaintenanceUseCase = new UpdateMaintenanceUseCase(repository);
 const deleteMaintenanceUseCase = new DeleteMaintenanceUseCase(repository);

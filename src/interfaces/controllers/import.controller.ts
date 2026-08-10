@@ -1,11 +1,11 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { ImportRepository } from '../../infrastructure/repositories/import.repository';
+import { RepositoryFactory } from '../../infrastructure/database/repository.factory';
 import { ImportExcelUseCase } from '../../application/import/import-excel/import-excel.usecase';
 import { GetTemplateUseCase } from '../../application/import/get-template/get-template.usecase';
 import { importPayloadSchema } from '../validators/import/import.validator';
 import { successResponse } from '../../shared/utils/response.util';
 
-const repository = new ImportRepository();
+const repository = RepositoryFactory.getImportRepository();
 const importExcelUseCase = new ImportExcelUseCase(repository);
 const getTemplateUseCase = new GetTemplateUseCase();
 

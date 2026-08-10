@@ -1,4 +1,4 @@
-import { Asset } from '@prisma/client';
+import { Asset } from '../../domain/assets/asset.entity';
 import { prisma } from '../database/prisma.service';
 import { IImportRepository } from '../../domain/import/import.repository.interface';
 
@@ -77,12 +77,13 @@ export class ImportRepository implements IImportRepository {
   }
 
   async bulkCreateAssets(assetsData: any[]): Promise<Asset[]> {
-    return prisma.$transaction(
+    const items = await prisma.$transaction(
       assetsData.map((data) =>
         prisma.asset.create({
           data,
         }),
       ),
     );
+    return items as unknown as Asset[];
   }
 }

@@ -1,4 +1,4 @@
-import { AssetStatus } from '@prisma/client';
+import { AssetStatus } from './status.entity';
 
 export interface StatusWithCount extends AssetStatus {
   totalAssets?: number;

@@ -1,11 +1,11 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { AuditLogRepository } from '../../infrastructure/repositories/audit-log.repository';
+import { RepositoryFactory } from '../../infrastructure/database/repository.factory';
 import { GetAuditLogsUseCase } from '../../application/audit-logs/get-audit-logs/get-audit-logs.usecase';
 import { GetAuditStatsUseCase } from '../../application/audit-logs/get-audit-stats/get-audit-stats.usecase';
 import { queryAuditLogSchema } from '../validators/audit-logs/audit-log.validator';
 import { successResponse } from '../../shared/utils/response.util';
 
-const repository = new AuditLogRepository();
+const repository = RepositoryFactory.getAuditLogRepository();
 const getAuditLogsUseCase = new GetAuditLogsUseCase(repository);
 const getAuditStatsUseCase = new GetAuditStatsUseCase(repository);
 

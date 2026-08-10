@@ -1,4 +1,4 @@
-import { AssetCategory } from '@prisma/client';
+import { AssetCategory } from './category.entity';
 
 export interface CategoryWithCount extends AssetCategory {
   totalAssets?: number;

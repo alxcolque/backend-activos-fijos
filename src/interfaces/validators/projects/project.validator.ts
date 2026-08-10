@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ProjectStatus } from '@prisma/client';
+import { ProjectStatus } from '../../../domain/enums/project-status.enum';
 
 export const createProjectSchema = z.object({
   name: z

@@ -1,4 +1,5 @@
-import { AssetMaintenance, MaintenanceType } from '@prisma/client';
+import { AssetMaintenance } from '../../domain/maintenances/maintenance.entity';
+import { MaintenanceType } from '../../domain/enums/maintenance-type.enum';
 import { prisma } from '../database/prisma.service';
 import {
   IMaintenanceRepository,
@@ -102,10 +103,10 @@ export class MaintenanceRepository implements IMaintenanceRepository {
   }
 
   async create(data: CreateMaintenanceDto): Promise<AssetMaintenance> {
-    return prisma.assetMaintenance.create({
+    const item = await prisma.assetMaintenance.create({
       data: {
         assetId: data.assetId,
-        type: data.type || 'PREVENTIVE',
+        type: (data.type as any) || 'PREVENTIVE',
         maintenanceDate: data.maintenanceDate,
         provider: data.provider || null,
         cost: data.cost !== undefined ? data.cost : null,
@@ -113,13 +114,14 @@ export class MaintenanceRepository implements IMaintenanceRepository {
         observations: data.observations || null,
       },
     });
+    return item as unknown as AssetMaintenance;
   }
 
   async update(id: string, data: UpdateMaintenanceDto): Promise<AssetMaintenance> {
-    return prisma.assetMaintenance.update({
+    const item = await prisma.assetMaintenance.update({
       where: { id },
       data: {
-        ...(data.type !== undefined && { type: data.type }),
+        ...(data.type !== undefined && { type: data.type as any }),
         ...(data.maintenanceDate !== undefined && { maintenanceDate: data.maintenanceDate }),
         ...(data.provider !== undefined && { provider: data.provider }),
         ...(data.cost !== undefined && { cost: data.cost }),
@@ -127,6 +129,7 @@ export class MaintenanceRepository implements IMaintenanceRepository {
         ...(data.observations !== undefined && { observations: data.observations }),
       },
     });
+    return item as unknown as AssetMaintenance;
   }
 
   async delete(id: string): Promise<void> {

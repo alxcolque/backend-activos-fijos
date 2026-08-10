@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { CategoryRepository } from '../../infrastructure/repositories/category.repository';
+import { RepositoryFactory } from '../../infrastructure/database/repository.factory';
 import { GetCategoriesUseCase } from '../../application/category/get-categories/get-categories.usecase';
 import { GetCategoryByIdUseCase } from '../../application/category/get-category-by-id/get-category-by-id.usecase';
 import { CreateCategoryUseCase } from '../../application/category/create-category/create-category.usecase';
@@ -11,7 +11,7 @@ import {
 } from '../validators/category/category.validator';
 import { successResponse } from '../../shared/utils/response.util';
 
-const categoryRepository = new CategoryRepository();
+const categoryRepository = RepositoryFactory.getCategoryRepository();
 const getCategoriesUseCase = new GetCategoriesUseCase(categoryRepository);
 const getCategoryByIdUseCase = new GetCategoryByIdUseCase(categoryRepository);
 const createCategoryUseCase = new CreateCategoryUseCase(categoryRepository);

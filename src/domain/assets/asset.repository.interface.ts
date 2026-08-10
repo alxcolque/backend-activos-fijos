@@ -1,4 +1,4 @@
-import { Asset } from '@prisma/client';
+import { Asset } from './asset.entity';
 
 export interface AssetListItem {
   id: string;

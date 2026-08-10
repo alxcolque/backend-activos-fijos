@@ -1,4 +1,4 @@
-import { AssetProject } from '@prisma/client';
+import { AssetProject } from '../../domain/asset-projects/asset-project.entity';
 import { prisma } from '../database/prisma.service';
 import {
   IAssetProjectRepository,

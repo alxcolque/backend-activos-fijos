@@ -1,4 +1,5 @@
-import { Inventory, InventoryItem, InventoryStatus } from '@prisma/client';
+import { Inventory, InventoryItem } from './inventory.entity';
+import { InventoryStatus } from '../enums/inventory-status.enum';
 
 export interface InventoryDetail extends Inventory {
   location?: {

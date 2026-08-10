@@ -1,4 +1,4 @@
-import { MaintenanceType } from '@prisma/client';
+import { MaintenanceType } from '../enums/maintenance-type.enum';
 
 export interface ReportFilterOptions {
   category?: string;

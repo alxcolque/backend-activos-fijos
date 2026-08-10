@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { InventoryRepository } from '../../infrastructure/repositories/inventory.repository';
+import { RepositoryFactory } from '../../infrastructure/database/repository.factory';
 import { CreateInventoryUseCase } from '../../application/inventories/create-inventory/create-inventory.usecase';
 import { DeleteInventoryUseCase } from '../../application/inventories/delete-inventory/delete-inventory.usecase';
 import { RegisterInventoryItemUseCase } from '../../application/inventories/register-inventory-item/register-inventory-item.usecase';
@@ -13,7 +13,7 @@ import {
 } from '../validators/inventories/inventory.validator';
 import { successResponse } from '../../shared/utils/response.util';
 
-const repository = new InventoryRepository();
+const repository = RepositoryFactory.getInventoryRepository();
 const createInventoryUseCase = new CreateInventoryUseCase(repository);
 const deleteInventoryUseCase = new DeleteInventoryUseCase(repository);
 const registerInventoryItemUseCase = new RegisterInventoryItemUseCase(repository);

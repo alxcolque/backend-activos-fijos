@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { AssetProjectRepository } from '../../infrastructure/repositories/asset-project.repository';
+import { RepositoryFactory } from '../../infrastructure/database/repository.factory';
 import { AssignAssetUseCase } from '../../application/asset-projects/assign-asset/assign-asset.usecase';
 import { ReleaseAssetUseCase } from '../../application/asset-projects/release-asset/release-asset.usecase';
 import { GetProjectAssetsUseCase } from '../../application/asset-projects/get-project-assets/get-project-assets.usecase';
@@ -12,7 +12,7 @@ import {
 } from '../validators/asset-projects/asset-project.validator';
 import { successResponse } from '../../shared/utils/response.util';
 
-const repository = new AssetProjectRepository();
+const repository = RepositoryFactory.getAssetProjectRepository();
 const assignAssetUseCase = new AssignAssetUseCase(repository);
 const releaseAssetUseCase = new ReleaseAssetUseCase(repository);
 const getProjectAssetsUseCase = new GetProjectAssetsUseCase(repository);

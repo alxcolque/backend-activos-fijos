@@ -3,7 +3,7 @@ import {
   LocationTreeNode,
 } from '../../../domain/locations/location.repository.interface';
 import { logger } from '../../../infrastructure/logger/logger';
-import { Location } from '@prisma/client';
+import { Location } from '../../../domain/locations/location.entity';
 
 export class GetTreeUseCase {
   constructor(private locationRepository: ILocationRepository) {}

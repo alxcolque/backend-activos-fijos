@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { StatusRepository } from '../../infrastructure/repositories/status.repository';
+import { RepositoryFactory } from '../../infrastructure/database/repository.factory';
 import { GetStatusesUseCase } from '../../application/status/get-statuses/get-statuses.usecase';
 import { GetStatusByIdUseCase } from '../../application/status/get-status-by-id/get-status-by-id.usecase';
 import { CreateStatusUseCase } from '../../application/status/create-status/create-status.usecase';
@@ -11,7 +11,7 @@ import {
 } from '../validators/status/status.validator';
 import { successResponse } from '../../shared/utils/response.util';
 
-const statusRepository = new StatusRepository();
+const statusRepository = RepositoryFactory.getStatusRepository();
 const getStatusesUseCase = new GetStatusesUseCase(statusRepository);
 const getStatusByIdUseCase = new GetStatusByIdUseCase(statusRepository);
 const createStatusUseCase = new CreateStatusUseCase(statusRepository);

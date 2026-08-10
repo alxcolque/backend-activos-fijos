@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MaintenanceType } from '@prisma/client';
+import { MaintenanceType } from '../../../domain/enums/maintenance-type.enum';
 
 export const reportQuerySchema = z.object({
   category: z.string().optional(),

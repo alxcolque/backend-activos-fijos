@@ -1,4 +1,4 @@
-import { Location } from '@prisma/client';
+import { Location } from '../../domain/locations/location.entity';
 import { prisma } from '../database/prisma.service';
 import {
   ILocationRepository,

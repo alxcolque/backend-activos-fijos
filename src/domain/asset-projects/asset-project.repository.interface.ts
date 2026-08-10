@@ -1,4 +1,4 @@
-import { AssetProject } from '@prisma/client';
+import { AssetProject } from './asset-project.entity';
 
 export interface AssetProjectDetail extends AssetProject {
   asset?: {

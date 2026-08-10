@@ -1,4 +1,4 @@
-import { AssetStatus } from '@prisma/client';
+import { AssetStatus } from '../../domain/status/status.entity';
 import { prisma } from '../database/prisma.service';
 import {
   IStatusRepository,

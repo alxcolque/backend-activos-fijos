@@ -1,4 +1,4 @@
-import { SystemSetting } from '@prisma/client';
+import { SystemSetting } from '../../domain/settings/setting.entity';
 import { prisma } from '../database/prisma.service';
 import {
   ISettingRepository,

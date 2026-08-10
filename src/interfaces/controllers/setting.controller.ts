@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { SettingRepository } from '../../infrastructure/repositories/setting.repository';
+import { RepositoryFactory } from '../../infrastructure/database/repository.factory';
 import { GetSettingsUseCase } from '../../application/settings/get-settings/get-settings.usecase';
 import { UpdateSettingsUseCase } from '../../application/settings/update-settings/update-settings.usecase';
 import { GetSettingByKeyUseCase } from '../../application/settings/get-setting-by-key/get-setting-by-key.usecase';
@@ -9,7 +9,7 @@ import {
 } from '../validators/settings/setting.validator';
 import { successResponse } from '../../shared/utils/response.util';
 
-const repository = new SettingRepository();
+const repository = RepositoryFactory.getSettingRepository();
 const getSettingsUseCase = new GetSettingsUseCase(repository);
 const updateSettingsUseCase = new UpdateSettingsUseCase(repository);
 const getSettingByKeyUseCase = new GetSettingByKeyUseCase(repository);
