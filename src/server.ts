@@ -18,11 +18,12 @@ async function startServer() {
       logger.info(`🚀 Servidor ejecutándose en Socket Passenger: ${rawPort}`);
     } else {
       const portNum = Number(rawPort);
+      const host = process.env.HOST || '127.0.0.1';
       await app.listen({
         port: portNum,
-        host: '0.0.0.0',
+        host,
       });
-      logger.info(`🚀 Servidor ejecutándose en puerto: ${portNum}`);
+      logger.info(`🚀 Servidor ejecutándose en http://${host}:${portNum}`);
     }
 
     logger.info(`📚 Documentación Swagger disponible en /docs`);
