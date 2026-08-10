@@ -2,7 +2,7 @@
 /uploads/*
 /backups/*
 /logs/*
-
+/tmp
 # Dependencias y compilación
 node_modules
 dist
