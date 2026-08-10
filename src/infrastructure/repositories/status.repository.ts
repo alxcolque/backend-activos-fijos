@@ -35,7 +35,7 @@ export class StatusRepository implements IStatusRepository {
       },
     });
 
-    return statuses.map((st) => ({
+    return statuses.map((st: any) => ({
       id: st.id,
       name: st.name,
       description: st.description,

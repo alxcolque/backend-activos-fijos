@@ -61,7 +61,7 @@ export class ProjectRepository implements IProjectRepository {
       }),
     ]);
 
-    const formattedData: ProjectWithCount[] = projects.map((p) => ({
+    const formattedData: ProjectWithCount[] = projects.map((p: any) => ({
       id: p.id,
       name: p.name,
       address: p.address,

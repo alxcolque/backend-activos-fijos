@@ -46,7 +46,7 @@ export class ReportRepository implements IReportRepository {
         totalPurchaseValue: Number(agg._sum.purchaseValue || 0),
         totalCurrentValue: Number(agg._sum.currentValue || 0),
       },
-      items: items.map((a) => ({
+      items: items.map((a: any) => ({
         id: a.id,
         code: a.code,
         qrCode: a.qrCode,
@@ -82,7 +82,7 @@ export class ReportRepository implements IReportRepository {
     let totalAccumulatedDepreciation = 0;
     let totalNetBookValue = 0;
 
-    const items: DepreciationItem[] = assets.map((a) => {
+    const items: DepreciationItem[] = assets.map((a: any) => {
       const purchaseValue = a.purchaseValue ? Number(a.purchaseValue) : 0;
       const usefulLife = a.category?.usefulLife && a.category.usefulLife > 0 ? a.category.usefulLife : 5;
       const purchaseYear = a.purchaseYear || (a.purchaseDate ? new Date(a.purchaseDate).getFullYear() : targetYear);
@@ -145,7 +145,7 @@ export class ReportRepository implements IReportRepository {
         totalAssignments,
         activeAssignments,
       },
-      items: items.map((i) => ({
+      items: items.map((i: any) => ({
         id: i.id,
         responsibleName: i.responsibleName,
         position: i.position,
@@ -196,7 +196,7 @@ export class ReportRepository implements IReportRepository {
         preventiveCost,
         correctiveCost,
       },
-      items: items.map((m) => ({
+      items: items.map((m: any) => ({
         id: m.id,
         assetCode: m.asset.code,
         assetName: m.asset.name,

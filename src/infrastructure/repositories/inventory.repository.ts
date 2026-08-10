@@ -49,7 +49,7 @@ export class InventoryRepository implements IInventoryRepository {
       }),
     ]);
 
-    const formattedData: InventoryDetail[] = items.map((inv) => ({
+    const formattedData: InventoryDetail[] = items.map((inv: any) => ({
       id: inv.id,
       name: inv.name,
       inventoryDate: inv.inventoryDate,
@@ -92,9 +92,9 @@ export class InventoryRepository implements IInventoryRepository {
       return null;
     }
 
-    const found = inv.items.filter((i) => i.status === 'FOUND').length;
-    const notFound = inv.items.filter((i) => i.status === 'NOT_FOUND').length;
-    const damaged = inv.items.filter((i) => i.status === 'DAMAGED').length;
+    const found = inv.items.filter((i: any) => i.status === 'FOUND').length;
+    const notFound = inv.items.filter((i: any) => i.status === 'NOT_FOUND').length;
+    const damaged = inv.items.filter((i: any) => i.status === 'DAMAGED').length;
 
     return {
       id: inv.id,

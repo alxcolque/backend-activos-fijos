@@ -52,7 +52,7 @@ export class LocationRepository implements ILocationRepository {
       }),
     ]);
 
-    const formattedData: LocationWithCount[] = locations.map((loc) => ({
+    const formattedData: LocationWithCount[] = locations.map((loc: any) => ({
       id: loc.id,
       parentId: loc.parentId,
       name: loc.name,

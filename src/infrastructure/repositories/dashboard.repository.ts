@@ -67,7 +67,7 @@ export class DashboardRepository implements IDashboardRepository {
       },
     });
 
-    return statuses.map((s) => ({
+    return statuses.map((s: any) => ({
       status: s.name,
       count: s._count.assets,
     }));
@@ -117,7 +117,7 @@ export class DashboardRepository implements IDashboardRepository {
       },
     });
 
-    return locations.map((l) => ({
+    return locations.map((l: any) => ({
       location: l.name,
       quantity: l._count.assets,
     }));
@@ -151,7 +151,7 @@ export class DashboardRepository implements IDashboardRepository {
       },
     });
 
-    return assets.map((a) => ({
+    return assets.map((a: any) => ({
       action: 'UPDATE',
       description: `Activo ${a.code} - ${a.name} actualizado`,
       date: a.updatedAt,
