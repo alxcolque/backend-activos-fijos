@@ -1,12 +1,45 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "skipLibCheck": true
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "."
   },
+  "include": [
+    "src/application/**/*",
+    "src/domain/**/*",
+    "src/interfaces/**/*",
+    "src/infrastructure/config/**/*",
+    "src/infrastructure/logger/**/*",
+    "src/infrastructure/services/**/*",
+    "src/infrastructure/utils/**/*",
+    "src/infrastructure/database/mysql/**/*",
+    "src/infrastructure/database/mysql.client.ts",
+    "src/infrastructure/database/repository.factory.ts",
+    "src/infrastructure/database/prisma.service.ts",
+    "src/server.ts",
+    "src/app.ts"
+  ],
   "exclude": [
     "node_modules",
-    "dist",
-    "prisma",
-    "src/infrastructure/repositories"
+    "dist"
   ]
 }

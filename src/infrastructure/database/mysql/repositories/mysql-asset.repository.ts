@@ -13,7 +13,7 @@ import {
 } from '../../../../domain/assets/asset.repository.interface';
 import {
   calculateFinancials,
-} from '../../../repositories/asset.repository';
+} from '../../../utils/asset-financials';
 
 export class MySQLAssetRepository implements IAssetRepository {
   private mapRowToAsset(row: any): Asset {
