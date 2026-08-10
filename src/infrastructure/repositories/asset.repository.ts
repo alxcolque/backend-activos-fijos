@@ -149,7 +149,7 @@ export class AssetRepository implements IAssetRepository {
       }),
     ]);
 
-    const formattedData: AssetListItem[] = assets.map((a) => {
+    const formattedData: AssetListItem[] = assets.map((a: any) => {
       const pVal = a.purchaseValue ? Number(a.purchaseValue) : 0;
       const uLife = a.category?.usefulLife ?? 5;
       const fin = calculateFinancials(pVal, a.purchaseDate, uLife);

@@ -36,7 +36,7 @@ export class CategoryRepository implements ICategoryRepository {
       },
     });
 
-    return categories.map((cat) => ({
+    return categories.map((cat: any) => ({
       id: cat.id,
       name: cat.name,
       description: cat.description,
