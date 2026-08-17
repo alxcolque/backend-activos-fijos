@@ -34,12 +34,29 @@ export class MySQLDashboardRepository implements IDashboardRepository {
     );
     const inactiveAssets = Number(inactRows[0]?.count || 0);
 
+    const [projRows] = await mysqlPool.execute<RowDataPacket[]>(
+      'SELECT COUNT(*) as total, SUM(CASE WHEN status = "ACTIVE" THEN 1 ELSE 0 END) as active FROM projects WHERE deletedAt IS NULL',
+    );
+    const totalProjects = Number(projRows[0]?.total || 0);
+    const activeProjects = Number(projRows[0]?.active || 0);
+
+    const [qtyRows] = await mysqlPool.execute<RowDataPacket[]>(
+      'SELECT SUM(quantity) as totalQty, SUM(quantity_out) as totalAssigned FROM assets WHERE deletedAt IS NULL',
+    );
+    const totalAssignedQuantity = Number(qtyRows[0]?.totalAssigned || 0);
+    const totalQty = Number(qtyRows[0]?.totalQty || 0);
+    const totalAvailableQuantity = Math.max(0, totalQty - totalAssignedQuantity);
+
     return {
       totalAssets,
       totalValue,
       operationalAssets,
       maintenanceAssets,
       inactiveAssets,
+      totalProjects,
+      activeProjects,
+      totalAssignedQuantity,
+      totalAvailableQuantity,
     };
   }
 

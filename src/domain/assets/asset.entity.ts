@@ -12,6 +12,7 @@ export interface Asset {
   serialNumber: string | null;
   unit: string | null;
   quantity: number;
+  quantityOut: number;
   purchaseDate: Date | null;
   purchaseYear: number | null;
   purchaseValue: number | null;

@@ -58,17 +58,25 @@ export class UploadService implements IUploadService {
 
   async deleteFile(relativeFilePath: string): Promise<boolean> {
     try {
-      const cleanPath = relativeFilePath.startsWith('/')
-        ? relativeFilePath.substring(1)
-        : relativeFilePath;
+      if (!relativeFilePath) return false;
+
+      let cleanPath = relativeFilePath;
+      if (cleanPath.includes('/uploads/')) {
+        cleanPath = cleanPath.substring(cleanPath.indexOf('uploads/'));
+      } else if (cleanPath.startsWith('uploads/')) {
+        // Ya es una ruta relativa directa
+      } else if (cleanPath.startsWith('/')) {
+        cleanPath = cleanPath.substring(1);
+      }
 
       const fullPath = path.join(process.cwd(), cleanPath);
 
       if (fs.existsSync(fullPath)) {
         await fs.promises.unlink(fullPath);
-        logger.info({ relativeFilePath }, 'Archivo eliminado físicamente');
+        logger.info({ relativeFilePath, fullPath }, 'Archivo eliminado físicamente');
         return true;
       }
+      logger.warn({ relativeFilePath, fullPath }, 'El archivo no existe en el almacenamiento físico');
       return false;
     } catch (error) {
       logger.warn({ error, relativeFilePath }, 'No se pudo eliminar el archivo en disco');

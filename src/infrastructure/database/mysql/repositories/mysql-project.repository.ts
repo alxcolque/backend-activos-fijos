@@ -39,7 +39,7 @@ export class MySQLProjectRepository implements IProjectRepository {
 
     const sql = `
       SELECT p.id, p.name, p.address, p.responsible, p.status, p.startDate, p.endDate, p.description, p.createdAt, p.updatedAt, p.deletedAt,
-             (SELECT COUNT(*) FROM asset_projects ap WHERE ap.projectId = p.id) AS totalAssets
+             (SELECT COALESCE(SUM(quantity), 0) FROM asset_projects ap WHERE ap.projectId = p.id AND ap.releasedAt IS NULL) AS totalAssets
       FROM projects p
       WHERE ${whereClause}
       ORDER BY ${sortBy} ${sortOrder}
@@ -77,7 +77,7 @@ export class MySQLProjectRepository implements IProjectRepository {
   async findById(id: string): Promise<ProjectWithCount | null> {
     const sql = `
       SELECT p.id, p.name, p.address, p.responsible, p.status, p.startDate, p.endDate, p.description, p.createdAt, p.updatedAt, p.deletedAt,
-             (SELECT COUNT(*) FROM asset_projects ap WHERE ap.projectId = p.id) AS totalAssets
+             (SELECT COALESCE(SUM(quantity), 0) FROM asset_projects ap WHERE ap.projectId = p.id AND ap.releasedAt IS NULL) AS totalAssets
       FROM projects p
       WHERE p.id = ? AND p.deletedAt IS NULL
       LIMIT 1

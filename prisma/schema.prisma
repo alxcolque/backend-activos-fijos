@@ -136,6 +136,7 @@ model Asset {
   serialNumber  String?   @unique
   unit          String?   @default("PZA")
   quantity      Int       @default(1)
+  quantityOut   Int       @default(0) @map("quantity_out")
   purchaseDate  DateTime?
   purchaseYear  Int?
   purchaseValue Decimal?  @db.Decimal(12, 2)
@@ -171,6 +172,7 @@ model AssetProject {
   id           String    @id @default(uuid())
   assetId      String
   projectId    String
+  quantity     Int       @default(1)
   assignedAt   DateTime  @default(now())
   releasedAt   DateTime?
   observations String?   @db.Text

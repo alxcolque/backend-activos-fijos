@@ -1,6 +1,12 @@
 import { z } from 'zod';
 import { ProjectStatus } from '../../../domain/enums/project-status.enum';
 
+const assignedAssetItemSchema = z.object({
+  assetId: z.string().min(1, 'El ID del activo es obligatorio.'),
+  quantity: z.number().int().gt(0, 'La cantidad asignada debe ser mayor a 0.').default(1),
+  observations: z.string().optional(),
+});
+
 export const createProjectSchema = z.object({
   name: z
     .string({ required_error: 'El nombre del proyecto es obligatorio.' })
@@ -12,6 +18,7 @@ export const createProjectSchema = z.object({
   startDate: z.string().nullable().optional(),
   endDate: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
+  assignedAssets: z.array(assignedAssetItemSchema).optional(),
 });
 
 export const updateProjectSchema = z.object({
@@ -26,6 +33,7 @@ export const updateProjectSchema = z.object({
   startDate: z.string().nullable().optional(),
   endDate: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
+  assignedAssets: z.array(assignedAssetItemSchema).optional(),
 });
 
 export const queryProjectSchema = z.object({

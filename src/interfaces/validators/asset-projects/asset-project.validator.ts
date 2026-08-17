@@ -7,16 +7,15 @@ export const assignAssetSchema = z.object({
   projectId: z
     .string({ required_error: 'El ID del proyecto es obligatorio.' })
     .min(1, 'El ID del proyecto es obligatorio.'),
+  quantity: z.number().int().gt(0).optional().default(1),
   observations: z.string().optional(),
 });
 
 export const releaseAssetSchema = z.object({
-  assetId: z
-    .string({ required_error: 'El ID del activo es obligatorio.' })
-    .min(1, 'El ID del activo es obligatorio.'),
-  projectId: z
-    .string({ required_error: 'El ID del proyecto es obligatorio.' })
-    .min(1, 'El ID del proyecto es obligatorio.'),
+  assignmentId: z.string().optional(),
+  assetId: z.string().optional(),
+  projectId: z.string().optional(),
+  quantityToRelease: z.number().int().gt(0).optional(),
   observations: z.string().optional(),
 });
 

@@ -41,8 +41,11 @@ export interface IAssetProjectRepository {
   findActiveAssignment(assetId: string, projectId: string): Promise<AssetProject | null>;
   findByProjectId(projectId: string, activeOnly?: boolean): Promise<AssetProjectDetail[]>;
   findByAssetId(assetId: string): Promise<AssetProjectDetail[]>;
-  assign(data: { assetId: string; projectId: string; observations?: string }): Promise<AssetProject>;
-  release(id: string, observations?: string): Promise<AssetProject>;
+  assign(data: { assetId: string; projectId: string; quantity?: number; observations?: string }): Promise<AssetProject>;
+  release(id: string, observations?: string, quantityToRelease?: number): Promise<AssetProject>;
+  deleteAssignment(id: string): Promise<boolean>;
+  findById(id: string): Promise<AssetProject | null>;
   existsAsset(assetId: string): Promise<boolean>;
+  getAssetStock(assetId: string): Promise<{ exists: boolean; name?: string; code?: string; quantity?: number; quantityOut?: number; available?: number }>;
   findProjectStatus(projectId: string): Promise<{ exists: boolean; status?: string; name?: string }>;
 }

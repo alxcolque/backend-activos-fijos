@@ -5,6 +5,7 @@ import { ReleaseAssetUseCase } from '../../application/asset-projects/release-as
 import { GetProjectAssetsUseCase } from '../../application/asset-projects/get-project-assets/get-project-assets.usecase';
 import { GetAssetProjectsHistoryUseCase } from '../../application/asset-projects/get-asset-projects-history/get-asset-projects-history.usecase';
 import { GetAllAssignmentsUseCase } from '../../application/asset-projects/get-all-assignments/get-all-assignments.usecase';
+import { DeleteAssignmentUseCase } from '../../application/asset-projects/delete-assignment/delete-assignment.usecase';
 import {
   assignAssetSchema,
   releaseAssetSchema,
@@ -15,6 +16,7 @@ import { successResponse } from '../../shared/utils/response.util';
 const repository = RepositoryFactory.getAssetProjectRepository();
 const assignAssetUseCase = new AssignAssetUseCase(repository);
 const releaseAssetUseCase = new ReleaseAssetUseCase(repository);
+const deleteAssignmentUseCase = new DeleteAssignmentUseCase(repository);
 const getProjectAssetsUseCase = new GetProjectAssetsUseCase(repository);
 const getAssetProjectsHistoryUseCase = new GetAssetProjectsHistoryUseCase(repository);
 const getAllAssignmentsUseCase = new GetAllAssignmentsUseCase(repository);
@@ -32,6 +34,13 @@ export class AssetProjectController {
     const userId = request.user?.id;
     const result = await releaseAssetUseCase.execute(validatedBody, userId);
     return reply.status(200).send(successResponse(result, 'Activo liberado del proyecto exitosamente.'));
+  }
+
+  public static async deleteAssignment(request: FastifyRequest, reply: FastifyReply) {
+    const { id } = request.params as { id: string };
+    const userId = request.user?.id;
+    await deleteAssignmentUseCase.execute(id, userId);
+    return reply.status(200).send(successResponse(null, 'Asignación eliminada correctamente.'));
   }
 
   public static async getProjectAssets(request: FastifyRequest, reply: FastifyReply) {

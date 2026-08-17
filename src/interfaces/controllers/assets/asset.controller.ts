@@ -12,15 +12,17 @@ import {
   updateAssetSchema,
   queryAssetSchema,
 } from '../../validators/assets/asset.validator';
+import { UploadService } from '../../../infrastructure/services/upload.service';
 import { successResponse } from '../../../shared/utils/response.util';
 
 const assetRepository = RepositoryFactory.getAssetRepository();
+const uploadService = new UploadService();
 const getAssetsUseCase = new GetAssetsUseCase(assetRepository);
 const getAssetUseCase = new GetAssetUseCase(assetRepository);
 const getAssetByCodeUseCase = new GetAssetByCodeUseCase(assetRepository);
 const getAssetByQrUseCase = new GetAssetByQrUseCase(assetRepository);
 const createAssetUseCase = new CreateAssetUseCase(assetRepository);
-const updateAssetUseCase = new UpdateAssetUseCase(assetRepository);
+const updateAssetUseCase = new UpdateAssetUseCase(assetRepository, uploadService);
 const deleteAssetUseCase = new DeleteAssetUseCase(assetRepository);
 
 export class AssetController {

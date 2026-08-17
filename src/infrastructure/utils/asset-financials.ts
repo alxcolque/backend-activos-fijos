@@ -7,6 +7,46 @@
 export const ASSET_YEAR = 360;
 
 /**
+ * Extrae los componentes de fecha (año, mes 0-11, día 1-30) de manera consistente
+ * independientemente de si el valor es string YYYY-MM-DD, ISO string o Date.
+ */
+function extractDateParts(fecha: Date | string): { anio: number; mes: number; dia: number } {
+  if (typeof fecha === 'string') {
+    const match = fecha.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      return {
+        anio: parseInt(match[1], 10),
+        mes: parseInt(match[2], 10) - 1,
+        dia: Math.min(parseInt(match[3], 10), 30),
+      };
+    }
+    const d = new Date(fecha);
+    return {
+      anio: d.getUTCFullYear(),
+      mes: d.getUTCMonth(),
+      dia: Math.min(d.getUTCDate(), 30),
+    };
+  }
+
+  // Si es un objeto Date:
+  // Si la hora UTC es 00:00:00 (fecha de base de datos en UTC), usar partes UTC.
+  // Si tiene hora local diferente (como new Date() creado dinámicamente en zona horaria local), usar partes locales.
+  if (fecha.getUTCHours() === 0 && fecha.getUTCMinutes() === 0 && fecha.getUTCSeconds() === 0) {
+    return {
+      anio: fecha.getUTCFullYear(),
+      mes: fecha.getUTCMonth(),
+      dia: Math.min(fecha.getUTCDate(), 30),
+    };
+  } else {
+    return {
+      anio: fecha.getFullYear(),
+      mes: fecha.getMonth(),
+      dia: Math.min(fecha.getDate(), 30),
+    };
+  }
+}
+
+/**
  * Calcula días entre dos fechas usando el método días-360
  * (cada mes = 30 días, cada año = 360 días).
  */
@@ -18,20 +58,13 @@ export function dias360(fechaInicio: Date | string, fechaFin: Date | string = ne
     return 0;
   }
 
-  const isISOInicio = typeof fechaInicio === 'string' && (fechaInicio.includes('T') || fechaInicio.includes('Z'));
-  const diaInicio = Math.min(isISOInicio ? inicio.getUTCDate() : inicio.getDate(), 30);
-  const mesInicio = isISOInicio ? inicio.getUTCMonth() : inicio.getMonth();
-  const anioInicio = isISOInicio ? inicio.getUTCFullYear() : inicio.getFullYear();
-
-  const isISOFin = typeof fechaFin === 'string' && (fechaFin.includes('T') || fechaFin.includes('Z'));
-  const diaFin = Math.min(isISOFin ? fin.getUTCDate() : fin.getDate(), 30);
-  const mesFin = isISOFin ? fin.getUTCMonth() : fin.getMonth();
-  const anioFin = isISOFin ? fin.getUTCFullYear() : fin.getFullYear();
+  const inicioParts = extractDateParts(fechaInicio);
+  const finParts = extractDateParts(fechaFin);
 
   const resultado =
-    (anioFin - anioInicio) * 360 +
-    (mesFin - mesInicio) * 30 +
-    (diaFin - diaInicio);
+    (finParts.anio - inicioParts.anio) * 360 +
+    (finParts.mes - inicioParts.mes) * 30 +
+    (finParts.dia - inicioParts.dia);
 
   return Math.max(0, resultado);
 }

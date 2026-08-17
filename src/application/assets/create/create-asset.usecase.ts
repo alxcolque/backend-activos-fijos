@@ -50,6 +50,7 @@ export class CreateAssetUseCase {
       serialNumber: input.serialNumber,
       unit: input.unit || 'PZA',
       quantity: input.quantity,
+      quantityOut: input.quantityOut ?? 0,
       purchaseDate,
       purchaseYear: input.purchaseYear,
       purchaseValue: input.purchaseValue,

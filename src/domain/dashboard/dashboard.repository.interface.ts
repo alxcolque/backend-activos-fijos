@@ -4,6 +4,10 @@ export interface DashboardSummary {
   operationalAssets: number;
   maintenanceAssets: number;
   inactiveAssets: number;
+  totalProjects: number;
+  activeProjects: number;
+  totalAssignedQuantity: number;
+  totalAvailableQuantity: number;
 }
 
 export interface StatusStat {

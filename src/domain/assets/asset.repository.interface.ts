@@ -6,6 +6,7 @@ export interface AssetListItem {
   qrCode: string | null;
   name: string;
   quantity: number;
+  quantityOut: number;
   unit: string | null;
   category: { id: string; name: string; usefulLife?: number };
   status: { id: string; name: string };
@@ -16,6 +17,7 @@ export interface AssetListItem {
   purchaseDate: Date | string | null;
   purchaseValue: number | null;
   currentValue: number | null;
+  photo?: string | null;
   dep: number;
   depac: number;
   balance: number;
@@ -65,6 +67,7 @@ export interface CreateAssetDto {
   serialNumber?: string | null;
   unit?: string | null;
   quantity?: number;
+  quantityOut?: number;
   purchaseDate?: Date | null;
   purchaseYear?: number | null;
   purchaseValue?: number | null;
@@ -86,6 +89,7 @@ export interface UpdateAssetDto {
   serialNumber?: string | null;
   unit?: string | null;
   quantity?: number;
+  quantityOut?: number;
   purchaseDate?: Date | null;
   purchaseYear?: number | null;
   purchaseValue?: number | null;

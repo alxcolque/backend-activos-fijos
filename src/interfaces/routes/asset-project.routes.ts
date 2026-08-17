@@ -18,6 +18,7 @@ export async function assetProjectRoutes(fastify: FastifyInstance) {
           properties: {
             assetId: { type: 'string', example: 'uuid-activo' },
             projectId: { type: 'string', example: 'uuid-proyecto' },
+            quantity: { type: 'number', example: 1, default: 1 },
             observations: { type: 'string', example: 'Asignado para operación en mina' },
           },
         },
@@ -110,7 +111,7 @@ export async function assetProjectRoutes(fastify: FastifyInstance) {
             type: 'object',
             properties: {
               success: { type: 'boolean', example: true },
-              data: { type: 'array', items: { type: 'object' } },
+              data: { type: 'array', items: { type: 'object', additionalProperties: true } },
             },
           },
         },
@@ -140,7 +141,7 @@ export async function assetProjectRoutes(fastify: FastifyInstance) {
             type: 'object',
             properties: {
               success: { type: 'boolean', example: true },
-              data: { type: 'array', items: { type: 'object' } },
+              data: { type: 'array', items: { type: 'object', additionalProperties: true } },
             },
           },
         },
@@ -174,13 +175,43 @@ export async function assetProjectRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean', example: true },
               message: { type: 'string' },
-              data: { type: 'array', items: { type: 'object' } },
-              pagination: { type: 'object' },
+              data: { type: 'array', items: { type: 'object', additionalProperties: true } },
+              pagination: { type: 'object', additionalProperties: true },
             },
           },
         },
       },
     },
     AssetProjectController.getAllAssignments,
+  );
+
+  // Eliminar una asignación activo-proyecto por ID
+  fastify.delete(
+    '/:id',
+    {
+      onRequest: [authenticate],
+      schema: {
+        description: 'Eliminar físicamente una asignación activo-proyecto por su ID',
+        tags: ['Asignación Activos-Proyectos'],
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: { type: 'string' },
+          },
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean', example: true },
+              message: { type: 'string', example: 'Asignación eliminada correctamente.' },
+            },
+          },
+        },
+      },
+    },
+    AssetProjectController.deleteAssignment,
   );
 }

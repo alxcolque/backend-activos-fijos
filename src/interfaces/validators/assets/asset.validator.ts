@@ -31,6 +31,7 @@ export const createAssetSchema = z.object({
     .number({ required_error: 'La cantidad es obligatoria.' })
     .int('La cantidad debe ser un número entero.')
     .gt(0, 'La cantidad debe ser mayor a cero.'),
+  quantityOut: z.number().int().gte(0).optional().default(0),
   purchaseDate: z.string().nullable().optional(),
   purchaseYear: z.number().int().optional(),
   purchaseValue: z
@@ -78,6 +79,7 @@ export const updateAssetSchema = z.object({
     .int('La cantidad debe ser un número entero.')
     .gt(0, 'La cantidad debe ser mayor a cero.')
     .optional(),
+  quantityOut: z.number().int().gte(0).optional(),
   purchaseDate: z.string().nullable().optional(),
   purchaseYear: z.number().int().optional(),
   purchaseValue: z

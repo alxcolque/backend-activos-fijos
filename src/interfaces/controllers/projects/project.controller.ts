@@ -13,10 +13,12 @@ import {
 import { successResponse } from '../../../shared/utils/response.util';
 
 const projectRepository = RepositoryFactory.getProjectRepository();
+const assetProjectRepository = RepositoryFactory.getAssetProjectRepository();
+const assetRepository = RepositoryFactory.getAssetRepository();
 const getProjectsUseCase = new GetProjectsUseCase(projectRepository);
 const getProjectUseCase = new GetProjectUseCase(projectRepository);
-const createProjectUseCase = new CreateProjectUseCase(projectRepository);
-const updateProjectUseCase = new UpdateProjectUseCase(projectRepository);
+const createProjectUseCase = new CreateProjectUseCase(projectRepository, assetProjectRepository, assetRepository);
+const updateProjectUseCase = new UpdateProjectUseCase(projectRepository, assetProjectRepository, assetRepository);
 const deleteProjectUseCase = new DeleteProjectUseCase(projectRepository);
 
 export class ProjectController {

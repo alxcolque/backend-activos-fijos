@@ -22,12 +22,17 @@ export async function dashboardRoutes(fastify: FastifyInstance) {
                 properties: {
                   summary: {
                     type: 'object',
+                    additionalProperties: true,
                     properties: {
                       totalAssets: { type: 'number', example: 1250 },
                       totalValue: { type: 'number', example: 45000000 },
                       operationalAssets: { type: 'number', example: 980 },
                       maintenanceAssets: { type: 'number', example: 120 },
                       inactiveAssets: { type: 'number', example: 50 },
+                      totalProjects: { type: 'number', example: 12 },
+                      activeProjects: { type: 'number', example: 8 },
+                      totalAssignedQuantity: { type: 'number', example: 350 },
+                      totalAvailableQuantity: { type: 'number', example: 900 },
                     },
                   },
                   byStatus: {

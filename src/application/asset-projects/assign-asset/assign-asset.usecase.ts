@@ -22,9 +22,21 @@ export class AssignAssetUseCase {
       throw new AppError('Solo se pueden asignar activos a proyectos en estado ACTIVO.', 400);
     }
 
-    const activeAssignment = await this.assetProjectRepository.findActiveAssignmentByAssetId(input.assetId);
-    if (activeAssignment) {
-      throw new AppError('El activo ya se encuentra asignado a un proyecto activo.', 400);
+    const stock = await this.assetProjectRepository.getAssetStock(input.assetId);
+    if (!stock.exists) {
+      throw new NotFoundError('Activo no encontrado.');
+    }
+
+    const requestedQty = input.quantity && input.quantity > 0 ? input.quantity : 1;
+    if (stock.available! <= 0) {
+      throw new AppError(`El activo "${stock.name}" (${stock.code}) no tiene unidades disponibles en almacén.`, 400);
+    }
+
+    if (requestedQty > stock.available!) {
+      throw new AppError(
+        `No existen suficientes unidades disponibles para "${stock.name}" (${stock.code}). Disponible: ${stock.available}, solicitado: ${requestedQty}.`,
+        400,
+      );
     }
 
     const assignment = await this.assetProjectRepository.assign(input);

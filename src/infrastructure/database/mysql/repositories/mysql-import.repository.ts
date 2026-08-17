@@ -163,6 +163,7 @@ export class MySQLImportRepository implements IImportRepository {
           serialNumber: data.serialNumber || null,
           unit,
           quantity,
+          quantityOut: 0,
           purchaseDate: data.purchaseDate || null,
           purchaseYear: data.purchaseYear || null,
           purchaseValue: data.purchaseValue !== undefined ? data.purchaseValue : null,

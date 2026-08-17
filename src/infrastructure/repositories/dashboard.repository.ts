@@ -44,12 +44,33 @@ export class DashboardRepository implements IDashboardRepository {
       },
     });
 
+    const totalProjects = await prisma.project.count({
+      where: { deletedAt: null },
+    });
+
+    const activeProjects = await prisma.project.count({
+      where: { status: 'ACTIVE', deletedAt: null },
+    });
+
+    const totalQtyAgg = await prisma.asset.aggregate({
+      where: { deletedAt: null },
+      _sum: { quantity: true, quantityOut: true },
+    });
+
+    const totalAssignedQuantity = Number(totalQtyAgg._sum.quantityOut || 0);
+    const totalQty = Number(totalQtyAgg._sum.quantity || 0);
+    const totalAvailableQuantity = Math.max(0, totalQty - totalAssignedQuantity);
+
     return {
       totalAssets,
       totalValue,
       operationalAssets,
       maintenanceAssets,
       inactiveAssets,
+      totalProjects,
+      activeProjects,
+      totalAssignedQuantity,
+      totalAvailableQuantity,
     };
   }
 

@@ -18,6 +18,7 @@ CREATE TABLE `asset_categories` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `description` TEXT NULL,
+    `usefulLife` INTEGER NOT NULL DEFAULT 5,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -55,9 +56,9 @@ CREATE TABLE `locations` (
 -- CreateTable
 CREATE TABLE `projects` (
     `id` VARCHAR(191) NOT NULL,
-    `code` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `type` ENUM('EXPLORATION', 'EXPLOITATION', 'ADMINISTRATIVE', 'OTHER') NOT NULL DEFAULT 'ADMINISTRATIVE',
+    `address` TEXT NULL,
+    `responsible` VARCHAR(191) NULL,
     `status` ENUM('ACTIVE', 'FINISHED', 'SUSPENDED', 'CANCELLED') NOT NULL DEFAULT 'ACTIVE',
     `startDate` DATETIME(3) NULL,
     `endDate` DATETIME(3) NULL,
@@ -66,12 +67,9 @@ CREATE TABLE `projects` (
     `updatedAt` DATETIME(3) NOT NULL,
     `deletedAt` DATETIME(3) NULL,
 
-    UNIQUE INDEX `projects_code_key`(`code`),
     UNIQUE INDEX `projects_name_key`(`name`),
-    INDEX `projects_code_idx`(`code`),
     INDEX `projects_name_idx`(`name`),
     INDEX `projects_status_idx`(`status`),
-    INDEX `projects_type_idx`(`type`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -90,10 +88,10 @@ CREATE TABLE `assets` (
     `serialNumber` VARCHAR(191) NULL,
     `unit` VARCHAR(191) NULL DEFAULT 'PZA',
     `quantity` INTEGER NOT NULL DEFAULT 1,
+    `quantity_out` INTEGER NOT NULL DEFAULT 0,
     `purchaseDate` DATETIME(3) NULL,
     `purchaseYear` INTEGER NULL,
     `purchaseValue` DECIMAL(12, 2) NULL,
-    `usefulLife` INTEGER NULL,
     `residualValue` DECIMAL(12, 2) NULL,
     `currentValue` DECIMAL(12, 2) NULL,
     `observations` TEXT NULL,
@@ -120,6 +118,7 @@ CREATE TABLE `asset_projects` (
     `id` VARCHAR(191) NOT NULL,
     `assetId` VARCHAR(191) NOT NULL,
     `projectId` VARCHAR(191) NOT NULL,
+    `quantity` INTEGER NOT NULL DEFAULT 1,
     `assignedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `releasedAt` DATETIME(3) NULL,
     `observations` TEXT NULL,

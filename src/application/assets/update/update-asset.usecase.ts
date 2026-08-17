@@ -1,17 +1,31 @@
 import { IAssetRepository } from '../../../domain/assets/asset.repository.interface';
+import { IUploadService } from '../../../domain/uploads/upload.service.interface';
 import { UpdateAssetInput } from '../../../interfaces/validators/assets/asset.validator';
 import { AppError, NotFoundError } from '../../../shared/errors/app-error';
 import { logger } from '../../../infrastructure/logger/logger';
 import { logAssetHistory } from '../../../shared/utils/audit.util';
 
 export class UpdateAssetUseCase {
-  constructor(private assetRepository: IAssetRepository) {}
+  constructor(
+    private assetRepository: IAssetRepository,
+    private uploadService?: IUploadService,
+  ) {}
 
   async execute(id: string, input: UpdateAssetInput, userId?: string) {
     const currentAsset = await this.assetRepository.findRawById(id);
 
     if (!currentAsset) {
       throw new NotFoundError('Activo no encontrado.');
+    }
+
+    // Si se modifica o elimina la foto y existía una foto previa en storage, borrarla físicamente
+    if (
+      input.photo !== undefined &&
+      currentAsset.photo &&
+      currentAsset.photo !== input.photo &&
+      this.uploadService
+    ) {
+      await this.uploadService.deleteFile(currentAsset.photo);
     }
 
     if (input.code && input.code !== currentAsset.code) {
