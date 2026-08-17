@@ -261,4 +261,31 @@ export async function projectRoutes(fastify: FastifyInstance) {
     },
     ProjectController.deleteProject,
   );
+
+  // Descargar Informe en Word (.docx)
+  const reportWordSchema = {
+    onRequest: [authenticate],
+    schema: {
+      description: 'Generar y descargar informe de inventarios del proyecto en documento Word (.docx)',
+      tags: ['Proyectos'],
+      security: [{ bearerAuth: [] }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: { type: 'string' },
+        },
+      },
+      querystring: {
+        type: 'object',
+        properties: {
+          pageSize: { type: 'string', enum: ['carta', 'a4', 'oficio'], default: 'carta' },
+          orientation: { type: 'string', enum: ['vertical', 'horizontal'], default: 'horizontal' },
+        },
+      },
+    },
+  };
+
+  fastify.get('/:id/report-word', reportWordSchema, ProjectController.downloadWordReport);
+  fastify.post('/:id/report-word', reportWordSchema, ProjectController.downloadWordReport);
 }

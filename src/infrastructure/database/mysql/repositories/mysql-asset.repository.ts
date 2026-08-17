@@ -14,6 +14,7 @@ import {
 import {
   calculateFinancials,
 } from '../../../utils/asset-financials';
+import { formatFileUrl } from '../../../../shared/utils/url.util';
 
 export class MySQLAssetRepository implements IAssetRepository {
   private mapRowToAsset(row: any): Asset {
@@ -38,7 +39,7 @@ export class MySQLAssetRepository implements IAssetRepository {
       residualValue: row.residualValue !== null && row.residualValue !== undefined ? Number(row.residualValue) : null,
       currentValue: row.currentValue !== null && row.currentValue !== undefined ? Number(row.currentValue) : null,
       observations: row.observations,
-      photo: row.photo,
+      photo: formatFileUrl(row.photo),
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
       deletedAt: row.deletedAt ? new Date(row.deletedAt) : null,
@@ -121,7 +122,7 @@ export class MySQLAssetRepository implements IAssetRepository {
         purchaseDate: row.purchaseDate ? new Date(row.purchaseDate) : null,
         purchaseValue: pVal,
         currentValue: row.currentValue ? Number(row.currentValue) : null,
-        photo: row.photo,
+        photo: formatFileUrl(row.photo),
         dep: fin.dep,
         depac: fin.depac,
         balance: fin.balance,

@@ -355,4 +355,28 @@ export async function assetRoutes(fastify: FastifyInstance) {
     },
     AssetController.deleteAsset,
   );
+
+  // Descargar Informe Word (.docx) de Activos Fijos
+  const reportWordSchema = {
+    onRequest: [authenticate],
+    schema: {
+      description: 'Generar y descargar reporte en Word (.docx) del catálogo de activos según filtros aplicados',
+      tags: ['Activos Fijos'],
+      security: [{ bearerAuth: [] }],
+      querystring: {
+        type: 'object',
+        properties: {
+          search: { type: 'string' },
+          category: { type: 'string' },
+          status: { type: 'string' },
+          location: { type: 'string' },
+          pageSize: { type: 'string', enum: ['carta', 'a4', 'oficio'], default: 'carta' },
+          orientation: { type: 'string', enum: ['vertical', 'horizontal'], default: 'horizontal' },
+        },
+      },
+    },
+  };
+
+  fastify.get('/report-word', reportWordSchema, AssetController.downloadWordReport);
+  fastify.post('/report-word', reportWordSchema, AssetController.downloadWordReport);
 }

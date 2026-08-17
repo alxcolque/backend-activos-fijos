@@ -12,6 +12,9 @@ import {
 } from '../../validators/projects/project.validator';
 import { successResponse } from '../../../shared/utils/response.util';
 
+import { generateProjectWordReport } from '../../../shared/utils/project-word-report.util';
+import { NotFoundError } from '../../../shared/errors/app-error';
+
 const projectRepository = RepositoryFactory.getProjectRepository();
 const assetProjectRepository = RepositoryFactory.getAssetProjectRepository();
 const assetRepository = RepositoryFactory.getAssetRepository();
@@ -56,5 +59,31 @@ export class ProjectController {
     const { id } = request.params as { id: string };
     const result = await deleteProjectUseCase.execute(id);
     return reply.status(200).send(successResponse(null, result.message));
+  }
+
+  public static async downloadWordReport(request: FastifyRequest, reply: FastifyReply) {
+    const { id } = request.params as { id: string };
+    const query = (request.query as { pageSize?: string; orientation?: string }) || {};
+    const body = (request.body as { pageSize?: string; orientation?: string }) || {};
+
+    const pageSize = (query.pageSize || body.pageSize || 'carta') as 'carta' | 'a4' | 'oficio';
+    const orientation = (query.orientation || body.orientation || 'horizontal') as 'vertical' | 'horizontal';
+
+    const project = await getProjectUseCase.execute(id);
+    if (!project) {
+      throw new NotFoundError('Proyecto no encontrado.');
+    }
+
+    const assignments = await assetProjectRepository.findByProjectId(id, false);
+
+    const wordBuffer = await generateProjectWordReport(project, assignments, { pageSize, orientation });
+
+    const safeName = project.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const filename = `Informe_Inventario_${safeName}.docx`;
+
+    return reply
+      .header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+      .header('Content-Disposition', `attachment; filename="${filename}"`)
+      .send(wordBuffer);
   }
 }

@@ -6,6 +6,7 @@ import {
   UploadedFileResult,
 } from '../../domain/uploads/upload.service.interface';
 import { logger } from '../logger/logger';
+import { formatFileUrl } from '../../shared/utils/url.util';
 
 export class UploadService implements IUploadService {
   private baseUploadDir: string;
@@ -41,9 +42,9 @@ export class UploadService implements IUploadService {
     await fs.promises.writeFile(fullFilePath, fileBuffer);
 
     const relativePath = `uploads/${validFolder}/${uniqueFileName}`;
-    const publicUrl = `/${relativePath}`;
+    const publicUrl = formatFileUrl(relativePath) || `/${relativePath}`;
 
-    logger.info({ relativePath }, 'Archivo guardado en el servidor');
+    logger.info({ relativePath, publicUrl }, 'Archivo guardado en el servidor');
 
     return {
       fileName: uniqueFileName,

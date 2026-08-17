@@ -10,6 +10,7 @@ import {
   UpdateAssetDto,
 } from '../../domain/assets/asset.repository.interface';
 import { ASSET_YEAR, dias360, calculateFinancials } from '../utils/asset-financials';
+import { formatFileUrl } from '../../shared/utils/url.util';
 
 export { dias360, calculateFinancials, ASSET_YEAR };
 
@@ -107,7 +108,7 @@ export class AssetRepository implements IAssetRepository {
         purchaseDate: a.purchaseDate,
         purchaseValue: pVal,
         currentValue: a.currentValue ? Number(a.currentValue) : null,
-        photo: a.photo,
+        photo: formatFileUrl(a.photo),
         dep: fin.dep,
         depac: fin.depac,
         balance: fin.balance,
@@ -144,6 +145,7 @@ export class AssetRepository implements IAssetRepository {
 
     return {
       ...asset,
+      photo: formatFileUrl(asset.photo),
       purchaseValue: pVal as any,
       currentValue: asset.currentValue ? (Number(asset.currentValue) as any) : null,
       residualValue: asset.residualValue ? (Number(asset.residualValue) as any) : null,
@@ -178,6 +180,7 @@ export class AssetRepository implements IAssetRepository {
 
     return {
       ...asset,
+      photo: formatFileUrl(asset.photo),
       purchaseValue: pVal as any,
       currentValue: asset.currentValue ? (Number(asset.currentValue) as any) : null,
       residualValue: asset.residualValue ? (Number(asset.residualValue) as any) : null,
@@ -205,6 +208,7 @@ export class AssetRepository implements IAssetRepository {
 
     return {
       ...asset,
+      photo: formatFileUrl(asset.photo),
       purchaseValue: pVal as any,
       currentValue: asset.currentValue ? (Number(asset.currentValue) as any) : null,
       residualValue: asset.residualValue ? (Number(asset.residualValue) as any) : null,
@@ -218,7 +222,8 @@ export class AssetRepository implements IAssetRepository {
     const item = await prisma.asset.findFirst({
       where: { serialNumber, deletedAt: null },
     });
-    return item as unknown as Asset | null;
+    if (!item) return null;
+    return { ...item, photo: formatFileUrl(item.photo) } as unknown as Asset;
   }
 
   async create(data: CreateAssetDto): Promise<Asset> {
@@ -252,7 +257,7 @@ export class AssetRepository implements IAssetRepository {
         photo: data.photo || null,
       },
     });
-    return item as unknown as Asset;
+    return { ...item, photo: formatFileUrl(item.photo) } as unknown as Asset;
   }
 
   async update(id: string, data: UpdateAssetDto): Promise<Asset> {
@@ -279,7 +284,7 @@ export class AssetRepository implements IAssetRepository {
         ...(data.photo !== undefined && { photo: data.photo }),
       },
     });
-    return item as unknown as Asset;
+    return { ...item, photo: formatFileUrl(item.photo) } as unknown as Asset;
   }
 
   async delete(id: string): Promise<void> {

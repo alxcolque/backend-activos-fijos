@@ -14,6 +14,7 @@ import {
 } from '../../validators/assets/asset.validator';
 import { UploadService } from '../../../infrastructure/services/upload.service';
 import { successResponse } from '../../../shared/utils/response.util';
+import { generateAssetsWordReport } from '../../../shared/utils/assets-word-report.util';
 
 const assetRepository = RepositoryFactory.getAssetRepository();
 const uploadService = new UploadService();
@@ -75,5 +76,53 @@ export class AssetController {
     const userId = request.user?.id;
     const result = await deleteAssetUseCase.execute(id, userId);
     return reply.status(200).send(successResponse(null, result.message));
+  }
+
+  public static async downloadWordReport(request: FastifyRequest, reply: FastifyReply) {
+    const query = (request.query as {
+      search?: string;
+      category?: string;
+      status?: string;
+      location?: string;
+      pageSize?: string;
+      orientation?: string;
+    }) || {};
+
+    const body = (request.body as {
+      search?: string;
+      category?: string;
+      status?: string;
+      location?: string;
+      pageSize?: string;
+      orientation?: string;
+    }) || {};
+
+    const search = query.search || body.search || undefined;
+    const category = query.category || body.category || undefined;
+    const status = query.status || body.status || undefined;
+    const location = query.location || body.location || undefined;
+
+    const pageSize = (query.pageSize || body.pageSize || 'carta') as 'carta' | 'a4' | 'oficio';
+    const orientation = (query.orientation || body.orientation || 'horizontal') as 'vertical' | 'horizontal';
+
+    const result = await getAssetsUseCase.execute({
+      page: 1,
+      limit: 10000,
+      search,
+      category,
+      status,
+      location,
+      sortBy: 'code',
+      sortOrder: 'asc',
+    });
+
+    const wordBuffer = await generateAssetsWordReport(result.data, { pageSize, orientation });
+
+    const filename = `Reporte_Activos_Fijos_COMIBOL.docx`;
+
+    return reply
+      .header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+      .header('Content-Disposition', `attachment; filename="${filename}"`)
+      .send(wordBuffer);
   }
 }
