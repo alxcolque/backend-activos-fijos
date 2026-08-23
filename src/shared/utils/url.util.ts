@@ -6,7 +6,7 @@ export const formatFileUrl = (pathStr?: string | null): string | null => {
     return pathStr;
   }
   const clean = pathStr.replace(/^\/+/, '');
-  const baseUrl = process.env.APP_URL || process.env.SERVER_URL || `http://localhost:${env.PORT || 3001}`;
+  const baseUrl = env.APP_URL || process.env.APP_URL || process.env.SERVER_URL || `http://localhost:${env.PORT || 3001}`;
   const cleanBase = baseUrl.replace(/\/+$/, '').replace(/\/api(\/v1)?\/?$/, '');
 
   if (clean.startsWith('uploads/')) {

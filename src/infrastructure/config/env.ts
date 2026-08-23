@@ -13,6 +13,7 @@ const envSchema = z.object({
   UPLOAD_PATH: z.string().default('uploads'),
   MAX_UPLOAD_SIZE: z.string().default('10485760').transform((val) => parseInt(val, 10)),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
+  APP_URL: z.string().optional(),
   TZ: z.string().default('America/La_Paz'),
 });
 
