@@ -3,6 +3,7 @@ export interface User {
   email: string;
   password: string;
   fullName: string;
+  role?: string;
   isActive: boolean;
   lastLogin: Date | null;
   createdAt: Date;

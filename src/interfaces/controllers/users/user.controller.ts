@@ -27,9 +27,7 @@ export class UserController {
       success: true,
       message: 'Lista de usuarios obtenida exitosamente.',
       data: result.data,
-      meta: {
-        pagination: result.pagination,
-      },
+      pagination: result.pagination,
     });
   }
 
