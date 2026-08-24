@@ -113,6 +113,7 @@ export const queryAssetSchema = z.object({
   category: z.string().optional(),
   status: z.string().optional(),
   location: z.string().optional(),
+  calculationDate: z.string().optional(),
   sortBy: z.enum(['code', 'name', 'purchaseDate', 'purchaseValue', 'createdAt']).optional().default('name'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('asc'),
 });

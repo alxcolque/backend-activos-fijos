@@ -103,7 +103,7 @@ export async function generateAssetsWordReport(
                   new TextRun({
                     text: 'CORPORACIÓN MINERA DE BOLIVIA',
                     bold: true,
-                    size: 30, // 15pt
+                    size: 44, // 22pt
                     font: 'Arial',
                     color: '000000',
                   }),
@@ -116,7 +116,7 @@ export async function generateAssetsWordReport(
                   new TextRun({
                     text: 'DIRECCIÓN DE PROYECTOS Y GEOLOGÍA',
                     bold: true,
-                    size: 24, // 12pt
+                    size: 30, // 12pt
                     font: 'Arial',
                     color: '000000',
                   }),
@@ -137,7 +137,7 @@ export async function generateAssetsWordReport(
       new TextRun({
         text: 'REPORTE DE INVENTARIO ACTIVOS FIJOS',
         bold: true,
-        size: 26, // 13pt
+        size: 30, // 13pt
         font: 'Arial',
         color: '000000',
       }),

@@ -15,6 +15,7 @@ import {
 import { UploadService } from '../../../infrastructure/services/upload.service';
 import { successResponse } from '../../../shared/utils/response.util';
 import { generateAssetsWordReport } from '../../../shared/utils/assets-word-report.util';
+import { generateAssetsExcelReport } from '../../../shared/utils/assets-excel-report.util';
 
 const assetRepository = RepositoryFactory.getAssetRepository();
 const uploadService = new UploadService();
@@ -124,5 +125,58 @@ export class AssetController {
       .header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
       .header('Content-Disposition', `attachment; filename="${filename}"`)
       .send(wordBuffer);
+  }
+
+  public static async downloadExcelReport(request: FastifyRequest, reply: FastifyReply) {
+    try {
+      const query = (request.query as {
+        search?: string;
+        category?: string;
+        status?: string;
+        location?: string;
+        calculationDate?: string;
+      }) || {};
+
+      const body = (request.body as {
+        search?: string;
+        category?: string;
+        status?: string;
+        location?: string;
+        calculationDate?: string;
+      }) || {};
+
+      const search = query.search || body.search || undefined;
+      const category = query.category || body.category || undefined;
+      const status = query.status || body.status || undefined;
+      const location = query.location || body.location || undefined;
+      const calculationDate = query.calculationDate || body.calculationDate || undefined;
+
+      const result = await getAssetsUseCase.execute({
+        page: 1,
+        limit: 10000,
+        search,
+        category,
+        status,
+        location,
+        calculationDate,
+        sortBy: 'code',
+        sortOrder: 'asc',
+      });
+
+      const excelBuffer = await generateAssetsExcelReport(result.data, { calculationDate });
+
+      const filename = `Reporte_Activos_Fijos_COMIBOL.xlsx`;
+
+      return reply
+        .header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        .header('Content-Disposition', `attachment; filename="${filename}"`)
+        .send(excelBuffer);
+    } catch (error: any) {
+      console.error('Error al generar el reporte Excel de activos fijos:', error);
+      return reply.status(500).send({
+        success: false,
+        message: error.message || 'Error interno al generar el reporte Excel',
+      });
+    }
   }
 }

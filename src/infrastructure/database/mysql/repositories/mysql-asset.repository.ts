@@ -103,7 +103,7 @@ export class MySQLAssetRepository implements IAssetRepository {
     const formattedData: AssetListItem[] = rows.map((row) => {
       const pVal = row.purchaseValue ? Number(row.purchaseValue) : 0;
       const uLife = row.categoryUsefulLife ? Number(row.categoryUsefulLife) : 5;
-      const fin = calculateFinancials(pVal, row.purchaseDate, uLife);
+      const fin = calculateFinancials(pVal, row.purchaseDate, uLife, options.calculationDate);
 
       return {
         id: row.id,

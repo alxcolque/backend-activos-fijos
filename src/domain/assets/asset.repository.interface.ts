@@ -42,6 +42,7 @@ export interface FindAllAssetsOptions {
   location?: string;
   sortBy?: 'code' | 'name' | 'purchaseDate' | 'purchaseValue' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
+  calculationDate?: Date | string | null;
 }
 
 export interface PaginatedAssets {

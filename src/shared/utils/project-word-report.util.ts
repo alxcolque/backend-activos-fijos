@@ -106,7 +106,7 @@ export async function generateProjectWordReport(
                     text: 'CORPORACIÓN MINERA DE BOLIVIA',
                     bold: true,
                     underline: {},
-                    size: 32, // 16pt
+                    size: 44, // 16pt
                     font: 'Arial',
                     color: '000000',
                   }),
@@ -119,7 +119,7 @@ export async function generateProjectWordReport(
                   new TextRun({
                     text: project.name.toUpperCase(),
                     bold: true,
-                    size: 26, // 13pt
+                    size: 34, // 13pt
                     font: 'Arial',
                     color: '000000',
                   }),
@@ -148,7 +148,7 @@ export async function generateProjectWordReport(
         font: 'Arial',
       }),
       new TextRun({
-        text: ' se realizó el inventario de activos del ',
+        text: ' se realizó la verificación y registro de los activos asignados al ',
         size: 22,
         font: 'Arial',
       }),
@@ -159,7 +159,7 @@ export async function generateProjectWordReport(
         font: 'Arial',
       }),
       new TextRun({
-        text: ', de acuerdo al siguiente detalle:',
+        text: ', de acuerdo con el siguiente detalle:',
         size: 22,
         font: 'Arial',
       }),

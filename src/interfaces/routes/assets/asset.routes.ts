@@ -379,4 +379,25 @@ export async function assetRoutes(fastify: FastifyInstance) {
 
   fastify.get('/report-word', reportWordSchema, AssetController.downloadWordReport);
   fastify.post('/report-word', reportWordSchema, AssetController.downloadWordReport);
+
+  const reportExcelSchema = {
+    onRequest: [authenticate],
+    schema: {
+      description: 'Generar e importar/descargar reporte oficial de Activos Fijos en formato Excel (.xlsx)',
+      tags: ['Activos Fijos'],
+      security: [{ bearerAuth: [] }],
+      querystring: {
+        type: 'object',
+        properties: {
+          search: { type: 'string' },
+          category: { type: 'string' },
+          status: { type: 'string' },
+          location: { type: 'string' },
+        },
+      },
+    },
+  };
+
+  fastify.get('/report-excel', reportExcelSchema, AssetController.downloadExcelReport);
+  fastify.post('/report-excel', reportExcelSchema, AssetController.downloadExcelReport);
 }
