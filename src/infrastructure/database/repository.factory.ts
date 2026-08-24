@@ -14,6 +14,7 @@ import { IReportRepository } from '../../domain/reports/report.repository.interf
 import { IImportRepository } from '../../domain/import/import.repository.interface';
 import { IDashboardRepository } from '../../domain/dashboard/dashboard.repository.interface';
 import { IAuditLogRepository } from '../../domain/audit-logs/audit-log.repository.interface';
+import { IUserRepository } from '../../domain/users/user.repository.interface';
 
 // Repositorios Prisma (Desarrollo)
 import { AuthRepository as PrismaAuthRepository } from '../repositories/auth.repository';
@@ -32,6 +33,7 @@ import { ReportRepository as PrismaReportRepository } from '../repositories/repo
 import { ImportRepository as PrismaImportRepository } from '../repositories/import.repository';
 import { DashboardRepository as PrismaDashboardRepository } from '../repositories/dashboard.repository';
 import { AuditLogRepository as PrismaAuditLogRepository } from '../repositories/audit-log.repository';
+import { UserRepository as PrismaUserRepository } from '../repositories/user.repository';
 
 // Repositorios MySQL (Producción)
 import { MySQLAuthRepository } from './mysql/repositories/mysql-auth.repository';
@@ -50,6 +52,7 @@ import { MySQLReportRepository } from './mysql/repositories/mysql-report.reposit
 import { MySQLImportRepository } from './mysql/repositories/mysql-import.repository';
 import { MySQLDashboardRepository } from './mysql/repositories/mysql-dashboard.repository';
 import { MySQLAuditLogRepository } from './mysql/repositories/mysql-audit-log.repository';
+import { MySQLUserRepository } from './mysql/repositories/mysql-user.repository';
 
 import { logger } from '../logger/logger';
 
@@ -62,6 +65,9 @@ if (isProduction) {
 }
 
 export class RepositoryFactory {
+  public static getUserRepository(): IUserRepository {
+    return isProduction ? new MySQLUserRepository() : new PrismaUserRepository();
+  }
   public static getAuthRepository(): IAuthRepository {
     return isProduction ? new MySQLAuthRepository() : new PrismaAuthRepository();
   }

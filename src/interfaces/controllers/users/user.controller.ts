@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { userRepository } from '../../../infrastructure/repositories/user.repository';
+import { RepositoryFactory } from '../../../infrastructure/database/repository.factory';
 import { GetUsersUseCase } from '../../../application/users/get-users.usecase';
 import { GetUserByIdUseCase } from '../../../application/users/get-user-by-id.usecase';
 import { CreateUserUseCase } from '../../../application/users/create-user.usecase';
@@ -12,6 +12,7 @@ import {
 } from '../../validators/users/user.validator';
 import { successResponse } from '../../../shared/utils/response.util';
 
+const userRepository = RepositoryFactory.getUserRepository();
 const getUsersUseCase = new GetUsersUseCase(userRepository);
 const getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
 const createUserUseCase = new CreateUserUseCase(userRepository);

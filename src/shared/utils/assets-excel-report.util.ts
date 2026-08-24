@@ -1,4 +1,4 @@
-import ExcelJS from 'exceljs';
+const ExcelJS = require('exceljs');
 import fs from 'fs';
 import path from 'path';
 import { env } from '../../infrastructure/config/env';

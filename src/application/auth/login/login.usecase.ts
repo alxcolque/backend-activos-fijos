@@ -5,7 +5,7 @@ import { LoginInput } from '../../../interfaces/validators/auth/auth.validator';
 import { AppError } from '../../../shared/errors/app-error';
 import { env } from '../../../infrastructure/config/env';
 import { logger } from '../../../infrastructure/logger/logger';
-import { prisma } from '../../../infrastructure/database/prisma.service';
+import { RepositoryFactory } from '../../../infrastructure/database/repository.factory';
 
 export class LoginUseCase {
   constructor(private authRepository: IAuthRepository) {}
@@ -16,13 +16,12 @@ export class LoginUseCase {
     if (!user && input.email === 'paula.comibol@gmail.com') {
       try {
         const hashedPassword = await bcrypt.hash('comibol1996', 10);
-        user = await prisma.user.create({
-          data: {
-            email: 'paula.comibol@gmail.com',
-            fullName: 'Paula Administrador',
-            password: hashedPassword,
-            isActive: true,
-          },
+        user = await RepositoryFactory.getUserRepository().create({
+          email: 'paula.comibol@gmail.com',
+          fullName: 'Paula Administrador',
+          password: hashedPassword,
+          role: 'admin',
+          isActive: true,
         }) as any;
       } catch {
         // Ignorar si falla la creación implícita

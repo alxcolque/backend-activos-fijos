@@ -20,6 +20,7 @@ import { IReportRepository } from '../../domain/reports/report.repository.interf
 import { IImportRepository } from '../../domain/import/import.repository.interface';
 import { IDashboardRepository } from '../../domain/dashboard/dashboard.repository.interface';
 import { IAuditLogRepository } from '../../domain/audit-logs/audit-log.repository.interface';
+import { IUserRepository } from '../../domain/users/user.repository.interface';
 
 // Repositorios MySQL nativos (mysql2) — sin Prisma
 import { MySQLAuthRepository } from './mysql/repositories/mysql-auth.repository';
@@ -38,12 +39,16 @@ import { MySQLReportRepository } from './mysql/repositories/mysql-report.reposit
 import { MySQLImportRepository } from './mysql/repositories/mysql-import.repository';
 import { MySQLDashboardRepository } from './mysql/repositories/mysql-dashboard.repository';
 import { MySQLAuditLogRepository } from './mysql/repositories/mysql-audit-log.repository';
+import { MySQLUserRepository } from './mysql/repositories/mysql-user.repository';
 
 import { logger } from '../logger/logger';
 
 logger.info('📦 Factory (PROD): Utilizando repositorios MySQL (mysql2) para Producción');
 
 export class RepositoryFactory {
+  public static getUserRepository(): IUserRepository {
+    return new MySQLUserRepository();
+  }
   public static getAuthRepository(): IAuthRepository {
     return new MySQLAuthRepository();
   }
