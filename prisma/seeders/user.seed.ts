@@ -2,24 +2,72 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 export async function seedUsers(prisma: PrismaClient): Promise<void> {
-  console.log('🌱 Seeding Users...');
+  console.log('🌱 Seeding Users (Admin, Operador, Guest)...');
 
-  const hashedPassword = await bcrypt.hash('comibol123', 10);
+  const hashedPassword = await bcrypt.hash('comibol1996', 10);
 
+  // Eliminar antiguo admin si existía
+  try {
+    await prisma.user.deleteMany({
+      where: { email: 'admin@comibol.gob.bo' },
+    });
+  } catch {
+    // Ignorar si no existe
+  }
+
+  // 1. Administrador Principal (Acceso Total)
   await prisma.user.upsert({
-    where: { email: 'admin@comibol.gob.bo' },
+    where: { email: 'paula.comibol@gmail.com' },
     update: {
-      fullName: 'Administrador',
+      fullName: 'Paula Administrador',
       password: hashedPassword,
+      role: 'admin',
       isActive: true,
-    },
+    } as any,
     create: {
-      email: 'admin@comibol.gob.bo',
-      fullName: 'Administrador',
+      email: 'paula.comibol@gmail.com',
+      fullName: 'Paula Administrador',
       password: hashedPassword,
+      role: 'admin',
       isActive: true,
-    },
+    } as any,
   });
 
-  console.log('✅ Users Seeded');
+  // 2. Operador (Gestión Operativa de Activos y Proyectos sin acceso a Usuarios / Ajustes)
+  await prisma.user.upsert({
+    where: { email: 'operador.comibol@gmail.com' },
+    update: {
+      fullName: 'Operador de Campo',
+      password: hashedPassword,
+      role: 'operador',
+      isActive: true,
+    } as any,
+    create: {
+      email: 'operador.comibol@gmail.com',
+      fullName: 'Operador de Campo',
+      password: hashedPassword,
+      role: 'operador',
+      isActive: true,
+    } as any,
+  });
+
+  // 3. Invitado / Guest (Solo Lectura y Filtros en Panel, Activos y Proyectos)
+  await prisma.user.upsert({
+    where: { email: 'invitado.comibol@gmail.com' },
+    update: {
+      fullName: 'Usuario Invitado',
+      password: hashedPassword,
+      role: 'guest',
+      isActive: true,
+    } as any,
+    create: {
+      email: 'invitado.comibol@gmail.com',
+      fullName: 'Usuario Invitado',
+      password: hashedPassword,
+      role: 'guest',
+      isActive: true,
+    } as any,
+  });
+
+  console.log('✅ Users Seeded (admin, operador, guest)');
 }

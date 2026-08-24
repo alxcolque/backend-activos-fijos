@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { env } from '../../infrastructure/config/env';
 import {
   Document,
   Packer,
@@ -236,11 +237,45 @@ export async function generateProjectWordReport(
       const fillBg = isEven ? 'FFFFFF' : 'F8FAFC';
       const isReleased = !!item.releasedAt;
 
+      const timeZone = env.TZ || process.env.TZ || 'America/La_Paz';
       const dateAssigned = item.assignedAt
-        ? new Date(item.assignedAt).toLocaleDateString('es-BO', { timeZone: 'UTC' })
+        ? new Date(item.assignedAt).toLocaleDateString('es-BO', { timeZone })
         : '—';
 
       const statusText = isReleased ? 'Liberado' : 'Vigente';
+
+      const obsText = (
+        item.observations ||
+        (item.asset as any)?.observations ||
+        (item.asset as any)?.description ||
+        ''
+      ).trim();
+
+      const assetCellParagraphs: Paragraph[] = [
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          children: [
+            new TextRun({ text: item.asset?.name || 'Activo Fijo', bold: true, size: 18, font: 'Arial' }),
+          ],
+        }),
+      ];
+
+      if (obsText) {
+        assetCellParagraphs.push(
+          new Paragraph({
+            alignment: AlignmentType.LEFT,
+            children: [
+              new TextRun({
+                text: `Obs: ${obsText}`,
+                italics: true,
+                size: 15, // Letras pequeñas (7.5pt)
+                color: '64748B',
+                font: 'Arial',
+              }),
+            ],
+          })
+        );
+      }
 
       tableRows.push(
         new TableRow({
@@ -258,7 +293,7 @@ export async function generateProjectWordReport(
             new TableCell({
               width: { size: 28, type: WidthType.PERCENTAGE },
               shading: { fill: fillBg, type: ShadingType.CLEAR, color: 'auto' },
-              children: [new Paragraph({ alignment: AlignmentType.LEFT, children: [new TextRun({ text: item.asset?.name || 'Activo Fijo', bold: true, size: 18, font: 'Arial' })] })],
+              children: assetCellParagraphs,
             }),
             new TableCell({
               width: { size: 18, type: WidthType.PERCENTAGE },

@@ -88,7 +88,7 @@ export class AssetRepository implements IAssetRepository {
 
     const formattedData: AssetListItem[] = assets.map((a: any) => {
       const pVal = a.purchaseValue ? Number(a.purchaseValue) : 0;
-      const uLife = a.category?.usefulLife ?? 5;
+      const uLife = a.category?.usefulLife ?? 0;
       const fin = calculateFinancials(pVal, a.purchaseDate, uLife, options.calculationDate);
 
       return {
@@ -140,7 +140,7 @@ export class AssetRepository implements IAssetRepository {
     if (!asset) return null;
 
     const pVal = asset.purchaseValue ? Number(asset.purchaseValue) : 0;
-    const uLife = asset.category?.usefulLife ?? 5;
+    const uLife = asset.category?.usefulLife ?? 0;
     const fin = calculateFinancials(pVal, asset.purchaseDate, uLife);
 
     return {
@@ -175,7 +175,7 @@ export class AssetRepository implements IAssetRepository {
     if (!asset) return null;
 
     const pVal = asset.purchaseValue ? Number(asset.purchaseValue) : 0;
-    const uLife = asset.category?.usefulLife ?? 5;
+    const uLife = asset.category?.usefulLife ?? 0;
     const fin = calculateFinancials(pVal, asset.purchaseDate, uLife);
 
     return {
@@ -203,7 +203,7 @@ export class AssetRepository implements IAssetRepository {
     if (!asset) return null;
 
     const pVal = asset.purchaseValue ? Number(asset.purchaseValue) : 0;
-    const uLife = asset.category?.usefulLife ?? 5;
+    const uLife = asset.category?.usefulLife ?? 0;
     const fin = calculateFinancials(pVal, asset.purchaseDate, uLife);
 
     return {

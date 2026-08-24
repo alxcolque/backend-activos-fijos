@@ -114,6 +114,8 @@ export class AssetProjectRepository implements IAssetProjectRepository {
             unit: true,
             quantity: true,
             quantityOut: true,
+            observations: true,
+            description: true,
             category: { select: { id: true, name: true } },
             status: { select: { id: true, name: true } },
           },

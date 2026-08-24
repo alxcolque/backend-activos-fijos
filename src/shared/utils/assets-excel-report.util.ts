@@ -1,11 +1,13 @@
 import ExcelJS from 'exceljs';
 import fs from 'fs';
 import path from 'path';
+import { env } from '../../infrastructure/config/env';
 
 export const generateAssetsExcelReport = async (
   assets: any[],
   options?: { calculationDate?: string | Date | null },
 ): Promise<Buffer> => {
+  const timeZone = env.TZ || process.env.TZ || 'America/La_Paz';
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'COMIBOL';
   workbook.created = new Date();
@@ -64,9 +66,23 @@ export const generateAssetsExcelReport = async (
   worksheet.getCell('C3').alignment = { vertical: 'middle', horizontal: 'left' };
 
   const now = new Date();
-  let calcLabel = `Fecha de Generación: ${now.toLocaleDateString('es-BO', { timeZone: 'UTC' })}, ${now.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}`;
+  const dateStr = now.toLocaleDateString('es-BO', { timeZone });
+  const timeStr = now.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit', timeZone });
+  let calcLabel = `Fecha de Generación: ${dateStr}, ${timeStr}`;
+
   if (options?.calculationDate) {
-    const datePart = typeof options.calculationDate === 'string' ? options.calculationDate.split('T')[0] : new Date(options.calculationDate).toISOString().split('T')[0];
+    let datePart = '';
+    if (typeof options.calculationDate === 'string') {
+      datePart = options.calculationDate.split('T')[0];
+    } else if (options.calculationDate instanceof Date) {
+      const d = options.calculationDate;
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      datePart = `${y}-${m}-${day}`;
+    } else {
+      datePart = String(options.calculationDate).split('T')[0];
+    }
     const parts = datePart.split('-');
     const formattedCalcDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : datePart;
     calcLabel = `Calculado al: ${formattedCalcDate}`;

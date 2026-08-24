@@ -1,16 +1,21 @@
 /**
  * asset-financials.ts
- * Utilidades de cálculo financiero para activos fijos.
- * Archivo compartido entre repositorios Prisma y MySQL — sin dependencias externas.
+ * Utilidades de cálculo financiero y depreciación para activos fijos.
+ * Estrictamente sincronizado con la zona horaria institucional de Bolivia (America/La_Paz).
  */
 
 export const ASSET_YEAR = 360;
+const SYSTEM_TIMEZONE = process.env.TZ;
 
 /**
- * Extrae los componentes de fecha (año, mes 0-11, día 1-30) de manera consistente
- * independientemente de si el valor es string YYYY-MM-DD, ISO string o Date.
+ * Extrae año, mes (0-11) y día (1-30) de manera estricta respetando la zona horaria America/La_Paz.
  */
 function extractDateParts(fecha: Date | string): { anio: number; mes: number; dia: number } {
+  if (!fecha) {
+    throw new Error('[Financial Error] Se requiere una fecha válida para extraer componentes de fecha.');
+  }
+
+  // 1. Si la fecha viene en formato 'YYYY-MM-DD' de base de datos o input
   if (typeof fecha === 'string') {
     const match = fecha.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (match) {
@@ -20,41 +25,33 @@ function extractDateParts(fecha: Date | string): { anio: number; mes: number; di
         dia: Math.min(parseInt(match[3], 10), 30),
       };
     }
-    const d = new Date(fecha);
-    return {
-      anio: d.getUTCFullYear(),
-      mes: d.getUTCMonth(),
-      dia: Math.min(d.getUTCDate(), 30),
-    };
   }
 
-  // Si es un objeto Date:
-  // Si la hora UTC es 00:00:00 (fecha de base de datos en UTC), usar partes UTC.
-  // Si tiene hora local diferente (como new Date() creado dinámicamente en zona horaria local), usar partes locales.
-  if (fecha.getUTCHours() === 0 && fecha.getUTCMinutes() === 0 && fecha.getUTCSeconds() === 0) {
-    return {
-      anio: fecha.getUTCFullYear(),
-      mes: fecha.getUTCMonth(),
-      dia: Math.min(fecha.getUTCDate(), 30),
-    };
-  } else {
-    return {
-      anio: fecha.getFullYear(),
-      mes: fecha.getMonth(),
-      dia: Math.min(fecha.getDate(), 30),
-    };
+  // 2. Si es objeto Date o ISO Timestamp, convertir según la zona horaria del sistema (America/La_Paz)
+  const d = fecha instanceof Date ? fecha : new Date(fecha);
+  if (isNaN(d.getTime())) {
+    throw new Error(`[Financial Error] Formato de fecha no válido: ${fecha}`);
   }
+
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: SYSTEM_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(d).split('-');
+
+  return {
+    anio: parseInt(parts[0], 10),
+    mes: parseInt(parts[1], 10) - 1,
+    dia: Math.min(parseInt(parts[2], 10), 30),
+  };
 }
 
 /**
- * Calcula días entre dos fechas usando el método días-360
- * (cada mes = 30 días, cada año = 360 días).
+ * Calcula días transcurridos entre dos fechas usando el método financiero Días-360 (360 días por año / 30 por mes).
  */
 export function dias360(fechaInicio: Date | string, fechaFin: Date | string = new Date()): number {
-  const inicio = new Date(fechaInicio);
-  const fin = new Date(fechaFin);
-
-  if (isNaN(inicio.getTime()) || isNaN(fin.getTime()) || fin <= inicio) {
+  if (!fechaInicio) {
     return 0;
   }
 
@@ -70,16 +67,23 @@ export function dias360(fechaInicio: Date | string, fechaFin: Date | string = ne
 }
 
 /**
- * Calcula depreciación, depreciación acumulada y balance de un activo.
+ * Calcula depreciación (%), depreciación acumulada (Bs.) y saldo/valor neto (Bs.) de un activo.
  */
 export function calculateFinancials(
-  purchaseValueNum: number | null | undefined,
+  purchaseValueNum: number,
   purchaseDateVal: Date | string | null | undefined,
-  usefulLifeVal: number | null | undefined,
-  currentDateVal: Date | string | null | undefined = new Date(),
-) {
-  const purchaseValue = purchaseValueNum ? Number(purchaseValueNum) : 0;
-  const avu = usefulLifeVal && Number(usefulLifeVal) > 0 ? Number(usefulLifeVal) : 5;
+  usefulLifeVal: number,
+  currentDateVal?: Date | string | null,
+): { dep: number; depac: number; balance: number } {
+  const purchaseValue = Number(purchaseValueNum || 0);
+  if (isNaN(purchaseValue) || purchaseValue < 0) {
+    console.error(`[Financial Error] El valor de compra (purchaseValue) no es válido: ${purchaseValueNum}`);
+  }
+
+  const avu = Number(usefulLifeVal || 0) > 0 ? Number(usefulLifeVal) : 5;
+  if (!usefulLifeVal || usefulLifeVal <= 0) {
+    console.warn(`[Financial Warning] Vida útil inválida o ausente (${usefulLifeVal}), aplicando valor estándar de 5 años`);
+  }
 
   const dpd = 100 / (avu * ASSET_YEAR);
   const dep = (100 / (ASSET_YEAR * avu)) * ASSET_YEAR;

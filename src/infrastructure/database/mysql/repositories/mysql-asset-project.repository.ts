@@ -129,7 +129,7 @@ export class MySQLAssetProjectRepository implements IAssetProjectRepository {
 
     const sql = `
       SELECT ap.*,
-             a.code AS assetCode, a.name AS assetName, a.brand AS assetBrand, a.model AS assetModel, a.serialNumber AS assetSerial, a.unit AS assetUnit, a.quantity AS assetQuantity, a.quantity_out AS assetQuantityOut,
+             a.code AS assetCode, a.name AS assetName, a.brand AS assetBrand, a.model AS assetModel, a.serialNumber AS assetSerial, a.unit AS assetUnit, a.quantity AS assetQuantity, a.quantity_out AS assetQuantityOut, a.observations AS assetObservations, a.description AS assetDescription,
              c.id AS categoryId, c.name AS categoryName,
              s.id AS statusId, s.name AS statusName
       FROM asset_projects ap
@@ -160,6 +160,8 @@ export class MySQLAssetProjectRepository implements IAssetProjectRepository {
         unit: row.assetUnit || 'PZA',
         quantity: Number(row.assetQuantity || 1),
         quantityOut: Number(row.assetQuantityOut || 0),
+        observations: row.assetObservations || null,
+        description: row.assetDescription || null,
         category: row.categoryId ? { id: row.categoryId, name: row.categoryName } : undefined,
         status: row.statusId ? { id: row.statusId, name: row.statusName } : undefined,
       },

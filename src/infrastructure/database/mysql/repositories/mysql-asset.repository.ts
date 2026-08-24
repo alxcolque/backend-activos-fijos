@@ -102,7 +102,7 @@ export class MySQLAssetRepository implements IAssetRepository {
 
     const formattedData: AssetListItem[] = rows.map((row) => {
       const pVal = row.purchaseValue ? Number(row.purchaseValue) : 0;
-      const uLife = row.categoryUsefulLife ? Number(row.categoryUsefulLife) : 5;
+      const uLife = row.categoryUsefulLife !== undefined && row.categoryUsefulLife !== null ? Number(row.categoryUsefulLife) : 0;
       const fin = calculateFinancials(pVal, row.purchaseDate, uLife, options.calculationDate);
 
       return {
@@ -160,7 +160,7 @@ export class MySQLAssetRepository implements IAssetRepository {
 
     const row = rows[0];
     const pVal = row.purchaseValue ? Number(row.purchaseValue) : 0;
-    const uLife = row.categoryUsefulLife ? Number(row.categoryUsefulLife) : 5;
+    const uLife = row.categoryUsefulLife !== undefined && row.categoryUsefulLife !== null ? Number(row.categoryUsefulLife) : 0;
     const fin = calculateFinancials(pVal, row.purchaseDate, uLife);
 
     const asset = this.mapRowToAsset(row);
@@ -208,7 +208,7 @@ export class MySQLAssetRepository implements IAssetRepository {
 
     const row = rows[0];
     const pVal = row.purchaseValue ? Number(row.purchaseValue) : 0;
-    const uLife = row.categoryUsefulLife ? Number(row.categoryUsefulLife) : 5;
+    const uLife = row.categoryUsefulLife !== undefined && row.categoryUsefulLife !== null ? Number(row.categoryUsefulLife) : 0;
     const fin = calculateFinancials(pVal, row.purchaseDate, uLife);
 
     const asset = this.mapRowToAsset(row);
@@ -246,7 +246,7 @@ export class MySQLAssetRepository implements IAssetRepository {
 
     const row = rows[0];
     const pVal = row.purchaseValue ? Number(row.purchaseValue) : 0;
-    const uLife = row.categoryUsefulLife ? Number(row.categoryUsefulLife) : 5;
+    const uLife = row.categoryUsefulLife !== undefined && row.categoryUsefulLife !== null ? Number(row.categoryUsefulLife) : 0;
     const fin = calculateFinancials(pVal, row.purchaseDate, uLife);
 
     const asset = this.mapRowToAsset(row);

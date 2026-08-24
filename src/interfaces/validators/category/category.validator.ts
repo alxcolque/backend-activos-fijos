@@ -9,7 +9,8 @@ export const createCategorySchema = z.object({
   usefulLife: z
     .union([z.string(), z.number()])
     .optional()
-    .transform((val) => (val != null ? Number(val) : 5)),
+    .transform((val) => (val != null ? Number(val) : 0))
+    .refine((val) => val >= 0, { message: 'La vida útil debe ser mayor o igual a 0 años.' }),
 });
 
 export const updateCategorySchema = z.object({

@@ -91,7 +91,7 @@ export class CategoryRepository implements ICategoryRepository {
       data: {
         name: data.name,
         description: data.description || null,
-        usefulLife: data.usefulLife ?? 5,
+        usefulLife: data.usefulLife ?? 0,
       },
     });
   }

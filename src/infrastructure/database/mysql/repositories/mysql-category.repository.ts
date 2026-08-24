@@ -85,7 +85,7 @@ export class MySQLCategoryRepository implements ICategoryRepository {
     const id = uuidv4();
     const now = new Date();
     const description = data.description || null;
-    const usefulLife = data.usefulLife ?? 5;
+    const usefulLife = data.usefulLife ?? 0;
 
     await mysqlPool.execute(
       'INSERT INTO asset_categories (id, name, description, usefulLife, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)',

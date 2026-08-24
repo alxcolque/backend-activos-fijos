@@ -49,6 +49,7 @@ model User {
   email     String    @unique
   password  String
   fullName  String
+  role      String    @default("admin")
   isActive  Boolean   @default(true)
   lastLogin DateTime?
   createdAt DateTime  @default(now())
@@ -61,7 +62,7 @@ model AssetCategory {
   id          String   @id @default(uuid())
   name        String   @unique
   description String?  @db.Text
-  usefulLife  Int      @default(5)
+  usefulLife  Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

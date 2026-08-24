@@ -18,6 +18,7 @@ import { reportRoutes } from './interfaces/routes/report.routes';
 import { settingRoutes } from './interfaces/routes/setting.routes';
 import { auditLogRoutes } from './interfaces/routes/audit-log.routes';
 import { uploadRoutes } from './interfaces/routes/upload.routes';
+import { userRoutes } from './interfaces/routes/users/user.routes';
 import { registerSwagger } from './plugins/swagger.plugin';
 import { registerCors } from './plugins/cors.plugin';
 import { registerHelmet } from './plugins/helmet.plugin';
@@ -72,6 +73,7 @@ export async function buildApp(): Promise<FastifyInstance> {
       await apiV1.register(settingRoutes, { prefix: '/settings' });
       await apiV1.register(auditLogRoutes, { prefix: '/audit-logs' });
       await apiV1.register(uploadRoutes, { prefix: '/uploads' });
+      await apiV1.register(userRoutes, { prefix: '/users' });
     },
     { prefix: '/api/v1' },
   );

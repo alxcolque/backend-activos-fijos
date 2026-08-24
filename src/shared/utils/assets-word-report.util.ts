@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { env } from '../../infrastructure/config/env';
 import {
   Document,
   Packer,
@@ -64,10 +65,11 @@ export async function generateAssetsWordReport(
     });
   }
 
-  // Formatear Fecha de Impresión (ej: 9/6/2026, 12:28:49 p.m.)
+  // Formatear Fecha de Impresión (ej: 9/6/2026, 12:28:49 p.m.) en la zona horaria del sistema
+  const timeZone = env.TZ || process.env.TZ || 'America/La_Paz';
   const now = new Date();
-  const dateStr = now.toLocaleDateString('es-BO', { day: 'numeric', month: 'numeric', year: 'numeric' });
-  const timeStr = now.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+  const dateStr = now.toLocaleDateString('es-BO', { day: 'numeric', month: 'numeric', year: 'numeric', timeZone });
+  const timeStr = now.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZone });
   const printDateFormatted = `${dateStr}, ${timeStr}`;
 
   // Encabezado según diseño PDF oficial
