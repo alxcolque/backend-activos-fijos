@@ -52,31 +52,35 @@ export async function buildApp(): Promise<FastifyInstance> {
   // Health check a nivel raíz
   await app.register(healthRoutes);
 
-  // Rutas con prefijo global /api/v1
-  await app.register(
-    async (apiV1) => {
-      await apiV1.register(healthRoutes);
-      await apiV1.register(authRoutes, { prefix: '/auth' });
-      await apiV1.register(dashboardRoutes, { prefix: '/dashboard' });
-      await apiV1.register(categoryRoutes, { prefix: '/categories' });
-      await apiV1.register(statusRoutes, { prefix: '/statuses' });
-      await apiV1.register(locationRoutes, { prefix: '/locations' });
-      await apiV1.register(projectRoutes, { prefix: '/projects' });
-      await apiV1.register(assetRoutes, { prefix: '/assets' });
-      await apiV1.register(assetProjectRoutes, { prefix: '/asset-projects' });
-      await apiV1.register(assignmentRoutes, { prefix: '/assignments' });
-      await apiV1.register(documentRoutes, { prefix: '/documents' });
-      await apiV1.register(maintenanceRoutes, { prefix: '/maintenances' });
-      await apiV1.register(inventoryRoutes, { prefix: '/inventories' });
-      await apiV1.register(importRoutes, { prefix: '/import' });
-      await apiV1.register(reportRoutes, { prefix: '/reports' });
-      await apiV1.register(settingRoutes, { prefix: '/settings' });
-      await apiV1.register(auditLogRoutes, { prefix: '/audit-logs' });
-      await apiV1.register(uploadRoutes, { prefix: '/uploads' });
-      await apiV1.register(userRoutes, { prefix: '/users' });
-    },
-    { prefix: '/api/v1' },
-  );
+  // Función registradora de todas las rutas del sistema
+  const registerApiRoutes = async (apiInstance: any) => {
+    await apiInstance.register(healthRoutes);
+    await apiInstance.register(authRoutes, { prefix: '/auth' });
+    await apiInstance.register(dashboardRoutes, { prefix: '/dashboard' });
+    await apiInstance.register(categoryRoutes, { prefix: '/categories' });
+    await apiInstance.register(statusRoutes, { prefix: '/statuses' });
+    await apiInstance.register(locationRoutes, { prefix: '/locations' });
+    await apiInstance.register(projectRoutes, { prefix: '/projects' });
+    await apiInstance.register(assetRoutes, { prefix: '/assets' });
+    await apiInstance.register(assetProjectRoutes, { prefix: '/asset-projects' });
+    await apiInstance.register(assignmentRoutes, { prefix: '/assignments' });
+    await apiInstance.register(documentRoutes, { prefix: '/documents' });
+    await apiInstance.register(maintenanceRoutes, { prefix: '/maintenances' });
+    await apiInstance.register(inventoryRoutes, { prefix: '/inventories' });
+    await apiInstance.register(importRoutes, { prefix: '/import' });
+    await apiInstance.register(reportRoutes, { prefix: '/reports' });
+    await apiInstance.register(settingRoutes, { prefix: '/settings' });
+    await apiInstance.register(auditLogRoutes, { prefix: '/audit-logs' });
+    await apiInstance.register(uploadRoutes, { prefix: '/uploads' });
+    await apiInstance.register(userRoutes, { prefix: '/users' });
+  };
+
+  // 1. Ruta estándar única /api (Recomendado en Producción)
+  await app.register(registerApiRoutes, { prefix: '/api' });
+
+  // 2. Compatibilidad con versiones previas (/api/v1 y /v1)
+  await app.register(registerApiRoutes, { prefix: '/api/v1' });
+  await app.register(registerApiRoutes, { prefix: '/v1' });
 
   return app;
 }

@@ -70,10 +70,10 @@ export function dias360(fechaInicio: Date | string, fechaFin: Date | string = ne
  * Calcula depreciación (%), depreciación acumulada (Bs.) y saldo/valor neto (Bs.) de un activo.
  */
 export function calculateFinancials(
-  purchaseValueNum: number,
-  purchaseDateVal: Date | string | null | undefined,
-  usefulLifeVal: number,
-  currentDateVal?: Date | string | null,
+  purchaseValueNum: number, //valor de adquisición del activo
+  purchaseDateVal: Date | string, //fecha de adquisición del activo
+  usefulLifeVal: number, //vida útil del activo
+  currentDateVal: Date | string, //fecha actual
 ): { dep: number; depac: number; balance: number } {
   const purchaseValue = Number(purchaseValueNum || 0);
   if (isNaN(purchaseValue) || purchaseValue < 0) {
