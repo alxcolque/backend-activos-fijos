@@ -47,8 +47,8 @@ export class AssetRepository implements IAssetRepository {
       ];
     }
 
-    const sortBy = options.sortBy || 'name';
-    const sortOrder = options.sortOrder || 'asc';
+    const sortBy = options.sortBy || 'createdAt';
+    const sortOrder = options.sortOrder || 'desc';
 
     const [total, assets] = await Promise.all([
       prisma.asset.count({ where: whereCondition }),

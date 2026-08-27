@@ -114,8 +114,8 @@ export const queryAssetSchema = z.object({
   status: z.string().optional(),
   location: z.string().optional(),
   calculationDate: z.string().optional(),
-  sortBy: z.enum(['code', 'name', 'purchaseDate', 'purchaseValue', 'createdAt']).optional().default('name'),
-  sortOrder: z.enum(['asc', 'desc']).optional().default('asc'),
+  sortBy: z.enum(['code', 'name', 'purchaseDate', 'purchaseValue', 'createdAt']).optional().default('createdAt'),
+  sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
 });
 
 export type CreateAssetInput = z.infer<typeof createAssetSchema>;

@@ -74,11 +74,11 @@ export class MySQLAssetRepository implements IAssetRepository {
 
     const whereClause = whereConditions.join(' AND ');
     const sortBy = options.sortBy === 'code' ? 'a.code'
+      : options.sortBy === 'name' ? 'a.name'
       : options.sortBy === 'purchaseDate' ? 'a.purchaseDate'
       : options.sortBy === 'purchaseValue' ? 'a.purchaseValue'
-      : options.sortBy === 'createdAt' ? 'a.createdAt'
-      : 'a.name';
-    const sortOrder = options.sortOrder?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+      : 'a.createdAt';
+    const sortOrder = options.sortOrder ? (options.sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC') : 'DESC';
 
     const countSql = `SELECT COUNT(*) as total FROM assets a WHERE ${whereClause}`;
     const [countRows] = await mysqlPool.execute<RowDataPacket[]>(countSql, params);
