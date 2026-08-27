@@ -14,7 +14,7 @@ import { IAssetProjectRepository } from '../../domain/asset-projects/asset-proje
 import { IAssignmentRepository } from '../../domain/assignments/assignment.repository.interface';
 import { IDocumentRepository } from '../../domain/documents/document.repository.interface';
 import { IMaintenanceRepository } from '../../domain/maintenances/maintenance.repository.interface';
-import { IInventoryRepository } from '../../domain/inventories/inventory.repository.interface';
+import { ISupplyRepository } from '../../domain/supplies/supply.repository.interface';
 import { ISettingRepository } from '../../domain/settings/setting.repository.interface';
 import { IReportRepository } from '../../domain/reports/report.repository.interface';
 import { IImportRepository } from '../../domain/import/import.repository.interface';
@@ -33,7 +33,7 @@ import { MySQLAssetProjectRepository } from './mysql/repositories/mysql-asset-pr
 import { MySQLAssignmentRepository } from './mysql/repositories/mysql-assignment.repository';
 import { MySQLDocumentRepository } from './mysql/repositories/mysql-document.repository';
 import { MySQLMaintenanceRepository } from './mysql/repositories/mysql-maintenance.repository';
-import { MySQLInventoryRepository } from './mysql/repositories/mysql-inventory.repository';
+import { MySQLSupplyRepository } from './mysql/repositories/mysql-supply.repository';
 import { MySQLSettingRepository } from './mysql/repositories/mysql-setting.repository';
 import { MySQLReportRepository } from './mysql/repositories/mysql-report.repository';
 import { MySQLImportRepository } from './mysql/repositories/mysql-import.repository';
@@ -89,8 +89,8 @@ export class RepositoryFactory {
     return new MySQLMaintenanceRepository();
   }
 
-  public static getInventoryRepository(): IInventoryRepository {
-    return new MySQLInventoryRepository();
+  public static getSupplyRepository(): ISupplyRepository {
+    return new MySQLSupplyRepository();
   }
 
   public static getSettingRepository(): ISettingRepository {

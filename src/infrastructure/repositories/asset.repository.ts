@@ -310,21 +310,19 @@ export class AssetRepository implements IAssetRepository {
   }
 
   async hasRelatedData(assetId: string): Promise<boolean> {
-    const [projectsCount, assignmentsCount, documentsCount, maintenancesCount, itemsCount] =
+    const [projectsCount, assignmentsCount, documentsCount, maintenancesCount] =
       await Promise.all([
         prisma.assetProject.count({ where: { assetId } }),
         prisma.assetAssignment.count({ where: { assetId } }),
         prisma.assetDocument.count({ where: { assetId } }),
         prisma.assetMaintenance.count({ where: { assetId } }),
-        prisma.inventoryItem.count({ where: { assetId } }),
       ]);
 
     return (
       projectsCount > 0 ||
       assignmentsCount > 0 ||
       documentsCount > 0 ||
-      maintenancesCount > 0 ||
-      itemsCount > 0
+      maintenancesCount > 0
     );
   }
 }

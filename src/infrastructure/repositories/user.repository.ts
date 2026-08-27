@@ -17,6 +17,7 @@ export class UserRepository implements IUserRepository {
       whereCondition.OR = [
         { email: { contains: options.search } },
         { fullName: { contains: options.search } },
+        { profession: { contains: options.search } },
       ];
     }
 
@@ -31,6 +32,7 @@ export class UserRepository implements IUserRepository {
           id: true,
           email: true,
           fullName: true,
+          profession: true,
           role: true,
           isActive: true,
           lastLogin: true,
@@ -60,6 +62,7 @@ export class UserRepository implements IUserRepository {
         id: true,
         email: true,
         fullName: true,
+        profession: true,
         role: true,
         isActive: true,
         lastLogin: true,
@@ -77,6 +80,7 @@ export class UserRepository implements IUserRepository {
         id: true,
         email: true,
         fullName: true,
+        profession: true,
         role: true,
         isActive: true,
         lastLogin: true,
@@ -87,11 +91,12 @@ export class UserRepository implements IUserRepository {
     return user as UserEntity | null;
   }
 
-  async create(data: { email: string; fullName: string; password: string; role?: UserRole; isActive?: boolean }): Promise<UserEntity> {
+  async create(data: { email: string; fullName: string; profession?: string | null; password: string; role?: UserRole; isActive?: boolean }): Promise<UserEntity> {
     const user = await prisma.user.create({
       data: {
         email: data.email.toLowerCase().trim(),
         fullName: data.fullName.trim(),
+        profession: data.profession ? data.profession.trim() : null,
         password: data.password,
         role: data.role || 'admin',
         isActive: data.isActive ?? true,
@@ -100,6 +105,7 @@ export class UserRepository implements IUserRepository {
         id: true,
         email: true,
         fullName: true,
+        profession: true,
         role: true,
         isActive: true,
         lastLogin: true,
@@ -113,11 +119,12 @@ export class UserRepository implements IUserRepository {
 
   async update(
     id: string,
-    data: { email?: string; fullName?: string; password?: string; role?: UserRole; isActive?: boolean },
+    data: { email?: string; fullName?: string; profession?: string | null; password?: string; role?: UserRole; isActive?: boolean },
   ): Promise<UserEntity> {
     const updateData: any = {};
     if (data.email !== undefined) updateData.email = data.email.toLowerCase().trim();
     if (data.fullName !== undefined) updateData.fullName = data.fullName.trim();
+    if (data.profession !== undefined) updateData.profession = data.profession ? data.profession.trim() : null;
     if (data.password !== undefined) updateData.password = data.password;
     if (data.role !== undefined) updateData.role = data.role;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
@@ -129,6 +136,7 @@ export class UserRepository implements IUserRepository {
         id: true,
         email: true,
         fullName: true,
+        profession: true,
         role: true,
         isActive: true,
         lastLogin: true,

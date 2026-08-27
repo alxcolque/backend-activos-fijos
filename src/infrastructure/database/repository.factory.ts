@@ -8,7 +8,7 @@ import { IAssetProjectRepository } from '../../domain/asset-projects/asset-proje
 import { IAssignmentRepository } from '../../domain/assignments/assignment.repository.interface';
 import { IDocumentRepository } from '../../domain/documents/document.repository.interface';
 import { IMaintenanceRepository } from '../../domain/maintenances/maintenance.repository.interface';
-import { IInventoryRepository } from '../../domain/inventories/inventory.repository.interface';
+import { ISupplyRepository } from '../../domain/supplies/supply.repository.interface';
 import { ISettingRepository } from '../../domain/settings/setting.repository.interface';
 import { IReportRepository } from '../../domain/reports/report.repository.interface';
 import { IImportRepository } from '../../domain/import/import.repository.interface';
@@ -27,7 +27,7 @@ import { AssetProjectRepository as PrismaAssetProjectRepository } from '../repos
 import { AssignmentRepository as PrismaAssignmentRepository } from '../repositories/assignment.repository';
 import { DocumentRepository as PrismaDocumentRepository } from '../repositories/document.repository';
 import { MaintenanceRepository as PrismaMaintenanceRepository } from '../repositories/maintenance.repository';
-import { InventoryRepository as PrismaInventoryRepository } from '../repositories/inventory.repository';
+import { SupplyRepository as PrismaSupplyRepository } from '../repositories/supply.repository';
 import { SettingRepository as PrismaSettingRepository } from '../repositories/setting.repository';
 import { ReportRepository as PrismaReportRepository } from '../repositories/report.repository';
 import { ImportRepository as PrismaImportRepository } from '../repositories/import.repository';
@@ -46,7 +46,7 @@ import { MySQLAssetProjectRepository } from './mysql/repositories/mysql-asset-pr
 import { MySQLAssignmentRepository } from './mysql/repositories/mysql-assignment.repository';
 import { MySQLDocumentRepository } from './mysql/repositories/mysql-document.repository';
 import { MySQLMaintenanceRepository } from './mysql/repositories/mysql-maintenance.repository';
-import { MySQLInventoryRepository } from './mysql/repositories/mysql-inventory.repository';
+import { MySQLSupplyRepository } from './mysql/repositories/mysql-supply.repository';
 import { MySQLSettingRepository } from './mysql/repositories/mysql-setting.repository';
 import { MySQLReportRepository } from './mysql/repositories/mysql-report.repository';
 import { MySQLImportRepository } from './mysql/repositories/mysql-import.repository';
@@ -108,8 +108,8 @@ export class RepositoryFactory {
     return isProduction ? new MySQLMaintenanceRepository() : new PrismaMaintenanceRepository();
   }
 
-  public static getInventoryRepository(): IInventoryRepository {
-    return isProduction ? new MySQLInventoryRepository() : new PrismaInventoryRepository();
+  public static getSupplyRepository(): ISupplyRepository {
+    return isProduction ? new MySQLSupplyRepository() : new PrismaSupplyRepository();
   }
 
   public static getSettingRepository(): ISettingRepository {

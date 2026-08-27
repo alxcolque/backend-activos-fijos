@@ -8,6 +8,7 @@ export const createUserSchema = z.object({
   email: z
     .string({ required_error: 'El correo electrónico es obligatorio.' })
     .email('Debe proporcionar un correo electrónico válido.'),
+  profession: z.string().max(150, 'La profesión no puede exceder 150 caracteres.').nullable().optional(),
   password: z
     .string({ required_error: 'La contraseña es obligatoria.' })
     .min(6, 'La contraseña debe tener al menos 6 caracteres.'),
@@ -22,6 +23,7 @@ export const updateUserSchema = z.object({
     .max(150, 'El nombre no puede exceder 150 caracteres.')
     .optional(),
   email: z.string().email('Debe proporcionar un correo electrónico válido.').optional(),
+  profession: z.string().max(150, 'La profesión no puede exceder 150 caracteres.').nullable().optional(),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.').optional().or(z.literal('')),
   role: z.enum(['admin', 'operador', 'guest']).optional(),
   isActive: z.boolean().optional(),

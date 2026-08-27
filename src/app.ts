@@ -12,7 +12,7 @@ import { assetProjectRoutes } from './interfaces/routes/asset-project.routes';
 import { assignmentRoutes } from './interfaces/routes/assignment.routes';
 import { documentRoutes } from './interfaces/routes/document.routes';
 import { maintenanceRoutes } from './interfaces/routes/maintenance.routes';
-import { inventoryRoutes } from './interfaces/routes/inventory.routes';
+import { supplyRoutes } from './interfaces/routes/supplies/supply.routes';
 import { importRoutes } from './interfaces/routes/import.routes';
 import { reportRoutes } from './interfaces/routes/report.routes';
 import { settingRoutes } from './interfaces/routes/setting.routes';
@@ -66,7 +66,7 @@ export async function buildApp(): Promise<FastifyInstance> {
     await apiInstance.register(assignmentRoutes, { prefix: '/assignments' });
     await apiInstance.register(documentRoutes, { prefix: '/documents' });
     await apiInstance.register(maintenanceRoutes, { prefix: '/maintenances' });
-    await apiInstance.register(inventoryRoutes, { prefix: '/inventories' });
+    await apiInstance.register(supplyRoutes, { prefix: '/supplies' });
     await apiInstance.register(importRoutes, { prefix: '/import' });
     await apiInstance.register(reportRoutes, { prefix: '/reports' });
     await apiInstance.register(settingRoutes, { prefix: '/settings' });

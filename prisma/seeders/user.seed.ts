@@ -20,6 +20,7 @@ export async function seedUsers(prisma: PrismaClient): Promise<void> {
     where: { email: 'paula.comibol@gmail.com' },
     update: {
       fullName: 'Paula Administrador',
+      profession: 'Administrador de Empresas',
       password: hashedPassword,
       role: 'admin',
       isActive: true,
@@ -27,6 +28,7 @@ export async function seedUsers(prisma: PrismaClient): Promise<void> {
     create: {
       email: 'paula.comibol@gmail.com',
       fullName: 'Paula Administrador',
+      profession: 'Administrador de Empresas',
       password: hashedPassword,
       role: 'admin',
       isActive: true,
@@ -38,6 +40,7 @@ export async function seedUsers(prisma: PrismaClient): Promise<void> {
     where: { email: 'operador.comibol@gmail.com' },
     update: {
       fullName: 'Operador de Campo',
+      profession: 'Ingeniero de Minas',
       password: hashedPassword,
       role: 'operador',
       isActive: true,
@@ -45,6 +48,7 @@ export async function seedUsers(prisma: PrismaClient): Promise<void> {
     create: {
       email: 'operador.comibol@gmail.com',
       fullName: 'Operador de Campo',
+      profession: 'Ingeniero de Minas',
       password: hashedPassword,
       role: 'operador',
       isActive: true,
@@ -56,6 +60,7 @@ export async function seedUsers(prisma: PrismaClient): Promise<void> {
     where: { email: 'invitado.comibol@gmail.com' },
     update: {
       fullName: 'Usuario Invitado',
+      profession: 'Auxiliar Administrativo',
       password: hashedPassword,
       role: 'guest',
       isActive: true,
@@ -63,6 +68,7 @@ export async function seedUsers(prisma: PrismaClient): Promise<void> {
     create: {
       email: 'invitado.comibol@gmail.com',
       fullName: 'Usuario Invitado',
+      profession: 'Auxiliar Administrativo',
       password: hashedPassword,
       role: 'guest',
       isActive: true,

@@ -394,14 +394,12 @@ export class MySQLAssetRepository implements IAssetRepository {
     const [ass] = await mysqlPool.execute<RowDataPacket[]>('SELECT COUNT(*) as total FROM asset_assignments WHERE assetId = ?', [assetId]);
     const [doc] = await mysqlPool.execute<RowDataPacket[]>('SELECT COUNT(*) as total FROM asset_documents WHERE assetId = ?', [assetId]);
     const [maint] = await mysqlPool.execute<RowDataPacket[]>('SELECT COUNT(*) as total FROM asset_maintenances WHERE assetId = ?', [assetId]);
-    const [item] = await mysqlPool.execute<RowDataPacket[]>('SELECT COUNT(*) as total FROM inventory_items WHERE assetId = ?', [assetId]);
 
     return (
       Number(ap[0]?.total || 0) > 0 ||
       Number(ass[0]?.total || 0) > 0 ||
       Number(doc[0]?.total || 0) > 0 ||
-      Number(maint[0]?.total || 0) > 0 ||
-      Number(item[0]?.total || 0) > 0
+      Number(maint[0]?.total || 0) > 0
     );
   }
 }

@@ -25,12 +25,6 @@ enum MaintenanceType {
   CORRECTIVE
 }
 
-enum InventoryStatus {
-  FOUND
-  NOT_FOUND
-  DAMAGED
-}
-
 enum DocumentType {
   PHOTO
   MANUAL
@@ -45,15 +39,20 @@ enum DocumentType {
 // ------------------------------------------------------
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
-  fullName  String
-  role      String    @default("admin")
-  isActive  Boolean   @default(true)
-  lastLogin DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         String    @id @default(uuid())
+  email      String    @unique
+  password   String
+  fullName   String
+  profession String?
+  role       String    @default("admin")
+  isActive   Boolean   @default(true)
+  lastLogin  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  deliverAcquisitions  Acquisition[] @relation("UserDeliverAcquisitions")
+  projectAcquisitions  Acquisition[] @relation("UserProjectAcquisitions")
+  checkoutAcquisitions Acquisition[] @relation("UserCheckoutAcquisitions")
 
   @@map("users")
 }
@@ -95,8 +94,7 @@ model Location {
   parent   Location?  @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
   children Location[] @relation("LocationHierarchy")
 
-  assets      Asset[]
-  inventories Inventory[]
+  assets Asset[]
 
   @@index([parentId])
   @@index([name])
@@ -116,7 +114,9 @@ model Project {
   updatedAt   DateTime      @updatedAt
   deletedAt   DateTime?
 
-  assetProjects AssetProject[]
+  assetProjects      AssetProject[]
+  supplyProjects     SupplyProject[]
+  acquisitionDetails AcquisitionDetail[]
 
   @@index([name])
   @@index([status])
@@ -153,11 +153,10 @@ model Asset {
   status   AssetStatus   @relation(fields: [statusId], references: [id])
   location Location      @relation(fields: [locationId], references: [id])
 
-  assetProjects  AssetProject[]
-  assignments    AssetAssignment[]
-  documents      AssetDocument[]
-  maintenances   AssetMaintenance[]
-  inventoryItems InventoryItem[]
+  assetProjects AssetProject[]
+  assignments   AssetAssignment[]
+  documents     AssetDocument[]
+  maintenances  AssetMaintenance[]
 
   @@index([code])
   @@index([qrCode])
@@ -241,36 +240,75 @@ model AssetMaintenance {
   @@map("asset_maintenances")
 }
 
-model Inventory {
-  id            String   @id @default(uuid())
-  name          String
-  inventoryDate DateTime
-  locationId    String
-  observations  String?  @db.Text
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+model Supply {
+  id             String    @id @default(uuid())
+  name           String
+  unit           String    @default("PZA")
+  inputQuantity  Int       @default(0) @map("input_quantity")
+  outputQuantity Int       @default(0) @map("output_quantity")
+  entryDate      DateTime? @map("entry_date")
+  observations   String?   @db.Text
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  location Location        @relation(fields: [locationId], references: [id])
-  items    InventoryItem[]
+  supplyProjects SupplyProject[]
 
-  @@map("inventories")
+  @@map("supplies")
 }
 
-model InventoryItem {
-  id           String          @id @default(uuid())
-  inventoryId  String
-  assetId      String
-  status       InventoryStatus @default(FOUND)
-  observations String?         @db.Text
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+model SupplyProject {
+  id           String   @id @default(uuid())
+  supplyId     String   @map("supply_id")
+  projectId    String   @map("project_id")
+  quantity     Int      @default(1)
+  observations String?  @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
-  asset     Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  supply  Supply  @relation(fields: [supplyId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-  @@index([inventoryId])
-  @@index([assetId])
-  @@map("inventory_items")
+  @@index([supplyId])
+  @@index([projectId])
+  @@map("supply_projects")
+}
+
+model Acquisition {
+  id             String    @id @default(uuid())
+  userId         String    @map("user_id")
+  projectUserId  String?   @map("project_user_id")
+  checkoutUserId String?   @map("checkout_user_id")
+  departureDate  DateTime? @map("departure_date")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  user         User   @relation("UserDeliverAcquisitions", fields: [userId], references: [id])
+  projectUser  User?  @relation("UserProjectAcquisitions", fields: [projectUserId], references: [id])
+  checkoutUser User?  @relation("UserCheckoutAcquisitions", fields: [checkoutUserId], references: [id])
+
+  details AcquisitionDetail[]
+
+  @@index([userId])
+  @@index([projectUserId])
+  @@index([checkoutUserId])
+  @@map("acquisitions")
+}
+
+model AcquisitionDetail {
+  id            String   @id @default(uuid())
+  acquisitionId String   @map("acquisition_id")
+  projectId     String?  @map("project_id")
+  unit          String?
+  quantity      Int      @default(1)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  acquisition Acquisition @relation(fields: [acquisitionId], references: [id], onDelete: Cascade)
+  project     Project?    @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([acquisitionId])
+  @@index([projectId])
+  @@map("acquisition_details")
 }
 
 model SystemSetting {

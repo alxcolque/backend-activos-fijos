@@ -4,6 +4,7 @@ CREATE TABLE `users` (
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
     `fullName` VARCHAR(191) NOT NULL,
+    `profession` VARCHAR(191) NULL,
     `role` VARCHAR(191) NOT NULL DEFAULT 'admin',
     `isActive` BOOLEAN NOT NULL DEFAULT true,
     `lastLogin` DATETIME(3) NULL,
@@ -182,30 +183,63 @@ CREATE TABLE `asset_maintenances` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `inventories` (
+CREATE TABLE `supplies` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `inventoryDate` DATETIME(3) NOT NULL,
-    `locationId` VARCHAR(191) NOT NULL,
+    `unit` VARCHAR(191) NOT NULL DEFAULT 'PZA',
+    `input_quantity` INTEGER NOT NULL DEFAULT 0,
+    `output_quantity` INTEGER NOT NULL DEFAULT 0,
+    `entry_date` DATETIME(3) NULL,
     `observations` TEXT NULL,
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `inventory_items` (
+CREATE TABLE `supply_projects` (
     `id` VARCHAR(191) NOT NULL,
-    `inventoryId` VARCHAR(191) NOT NULL,
-    `assetId` VARCHAR(191) NOT NULL,
-    `status` ENUM('FOUND', 'NOT_FOUND', 'DAMAGED') NOT NULL DEFAULT 'FOUND',
+    `supply_id` VARCHAR(191) NOT NULL,
+    `project_id` VARCHAR(191) NOT NULL,
+    `quantity` INTEGER NOT NULL DEFAULT 1,
     `observations` TEXT NULL,
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
 
-    INDEX `inventory_items_inventoryId_idx`(`inventoryId`),
-    INDEX `inventory_items_assetId_idx`(`assetId`),
+    INDEX `supply_projects_supply_id_idx`(`supply_id`),
+    INDEX `supply_projects_project_id_idx`(`project_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `acquisitions` (
+    `id` VARCHAR(191) NOT NULL,
+    `user_id` VARCHAR(191) NOT NULL,
+    `project_user_id` VARCHAR(191) NULL,
+    `checkout_user_id` VARCHAR(191) NULL,
+    `departure_date` DATETIME(3) NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    INDEX `acquisitions_user_id_idx`(`user_id`),
+    INDEX `acquisitions_project_user_id_idx`(`project_user_id`),
+    INDEX `acquisitions_checkout_user_id_idx`(`checkout_user_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `acquisition_details` (
+    `id` VARCHAR(191) NOT NULL,
+    `acquisition_id` VARCHAR(191) NOT NULL,
+    `project_id` VARCHAR(191) NULL,
+    `unit` VARCHAR(191) NULL,
+    `quantity` INTEGER NOT NULL DEFAULT 1,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    INDEX `acquisition_details_acquisition_id_idx`(`acquisition_id`),
+    INDEX `acquisition_details_project_id_idx`(`project_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -250,10 +284,22 @@ ALTER TABLE `asset_documents` ADD CONSTRAINT `asset_documents_assetId_fkey` FORE
 ALTER TABLE `asset_maintenances` ADD CONSTRAINT `asset_maintenances_assetId_fkey` FOREIGN KEY (`assetId`) REFERENCES `assets`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `inventories` ADD CONSTRAINT `inventories_locationId_fkey` FOREIGN KEY (`locationId`) REFERENCES `locations`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `supply_projects` ADD CONSTRAINT `supply_projects_supply_id_fkey` FOREIGN KEY (`supply_id`) REFERENCES `supplies`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `inventory_items` ADD CONSTRAINT `inventory_items_inventoryId_fkey` FOREIGN KEY (`inventoryId`) REFERENCES `inventories`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `supply_projects` ADD CONSTRAINT `supply_projects_project_id_fkey` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `inventory_items` ADD CONSTRAINT `inventory_items_assetId_fkey` FOREIGN KEY (`assetId`) REFERENCES `assets`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `acquisitions` ADD CONSTRAINT `acquisitions_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `acquisitions` ADD CONSTRAINT `acquisitions_project_user_id_fkey` FOREIGN KEY (`project_user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `acquisitions` ADD CONSTRAINT `acquisitions_checkout_user_id_fkey` FOREIGN KEY (`checkout_user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `acquisition_details` ADD CONSTRAINT `acquisition_details_acquisition_id_fkey` FOREIGN KEY (`acquisition_id`) REFERENCES `acquisitions`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `acquisition_details` ADD CONSTRAINT `acquisition_details_project_id_fkey` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

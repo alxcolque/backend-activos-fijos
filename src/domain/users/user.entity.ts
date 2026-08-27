@@ -4,6 +4,7 @@ export interface UserEntity {
   id: string;
   email: string;
   fullName: string;
+  profession?: string | null;
   role: UserRole;
   isActive: boolean;
   lastLogin: Date | null;

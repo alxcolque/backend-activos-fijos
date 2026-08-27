@@ -18,8 +18,8 @@ export class MySQLUserRepository implements IUserRepository {
     const params: any[] = [];
 
     if (options.search) {
-      whereConditions.push('(email LIKE ? OR fullName LIKE ?)');
-      params.push(`%${options.search}%`, `%${options.search}%`);
+      whereConditions.push('(email LIKE ? OR fullName LIKE ? OR profession LIKE ?)');
+      params.push(`%${options.search}%`, `%${options.search}%`, `%${options.search}%`);
     }
 
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
@@ -31,7 +31,7 @@ export class MySQLUserRepository implements IUserRepository {
     const total = Number(countRows[0]?.total || 0);
 
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(
-      `SELECT id, email, fullName, role, isActive, lastLogin, createdAt, updatedAt FROM users ${whereClause} ORDER BY createdAt DESC LIMIT ? OFFSET ?`,
+      `SELECT id, email, fullName, profession, role, isActive, lastLogin, createdAt, updatedAt FROM users ${whereClause} ORDER BY createdAt DESC LIMIT ? OFFSET ?`,
       [...params, limit, offset],
     );
 
@@ -39,6 +39,7 @@ export class MySQLUserRepository implements IUserRepository {
       id: r.id,
       email: r.email,
       fullName: r.fullName,
+      profession: r.profession || null,
       role: (r.role || 'admin') as UserRole,
       isActive: Boolean(r.isActive),
       lastLogin: r.lastLogin ? new Date(r.lastLogin) : null,
@@ -61,7 +62,7 @@ export class MySQLUserRepository implements IUserRepository {
 
   async findById(id: string): Promise<UserEntity | null> {
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(
-      'SELECT id, email, fullName, role, isActive, lastLogin, createdAt, updatedAt FROM users WHERE id = ? LIMIT 1',
+      'SELECT id, email, fullName, profession, role, isActive, lastLogin, createdAt, updatedAt FROM users WHERE id = ? LIMIT 1',
       [id],
     );
     if (!rows.length) return null;
@@ -70,6 +71,7 @@ export class MySQLUserRepository implements IUserRepository {
       id: r.id,
       email: r.email,
       fullName: r.fullName,
+      profession: r.profession || null,
       role: (r.role || 'admin') as UserRole,
       isActive: Boolean(r.isActive),
       lastLogin: r.lastLogin ? new Date(r.lastLogin) : null,
@@ -80,7 +82,7 @@ export class MySQLUserRepository implements IUserRepository {
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(
-      'SELECT id, email, fullName, role, isActive, lastLogin, createdAt, updatedAt FROM users WHERE email = ? LIMIT 1',
+      'SELECT id, email, fullName, profession, role, isActive, lastLogin, createdAt, updatedAt FROM users WHERE email = ? LIMIT 1',
       [email.toLowerCase().trim()],
     );
     if (!rows.length) return null;
@@ -89,6 +91,7 @@ export class MySQLUserRepository implements IUserRepository {
       id: r.id,
       email: r.email,
       fullName: r.fullName,
+      profession: r.profession || null,
       role: (r.role || 'admin') as UserRole,
       isActive: Boolean(r.isActive),
       lastLogin: r.lastLogin ? new Date(r.lastLogin) : null,
@@ -97,23 +100,25 @@ export class MySQLUserRepository implements IUserRepository {
     };
   }
 
-  async create(data: { email: string; fullName: string; password: string; role?: UserRole; isActive?: boolean }): Promise<UserEntity> {
+  async create(data: { email: string; fullName: string; profession?: string | null; password: string; role?: UserRole; isActive?: boolean }): Promise<UserEntity> {
     const id = uuidv4();
     const now = new Date();
     const email = data.email.toLowerCase().trim();
     const fullName = data.fullName.trim();
+    const profession = data.profession ? data.profession.trim() : null;
     const role = data.role || 'admin';
     const isActive = data.isActive ?? true;
 
     await mysqlPool.execute(
-      'INSERT INTO users (id, email, fullName, password, role, isActive, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [id, email, fullName, data.password, role, isActive, now, now],
+      'INSERT INTO users (id, email, fullName, profession, password, role, isActive, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [id, email, fullName, profession, data.password, role, isActive, now, now],
     );
 
     return {
       id,
       email,
       fullName,
+      profession,
       role,
       isActive,
       lastLogin: null,
@@ -124,7 +129,7 @@ export class MySQLUserRepository implements IUserRepository {
 
   async update(
     id: string,
-    data: { email?: string; fullName?: string; password?: string; role?: UserRole; isActive?: boolean },
+    data: { email?: string; fullName?: string; profession?: string | null; password?: string; role?: UserRole; isActive?: boolean },
   ): Promise<UserEntity> {
     const updates: string[] = [];
     const params: any[] = [];
@@ -136,6 +141,10 @@ export class MySQLUserRepository implements IUserRepository {
     if (data.fullName !== undefined) {
       updates.push('fullName = ?');
       params.push(data.fullName.trim());
+    }
+    if (data.profession !== undefined) {
+      updates.push('profession = ?');
+      params.push(data.profession ? data.profession.trim() : null);
     }
     if (data.password !== undefined) {
       updates.push('password = ?');
