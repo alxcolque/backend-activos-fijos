@@ -4,6 +4,8 @@ export interface FindAllSuppliesOptions {
   page?: number;
   limit?: number;
   search?: string;
+  categoryId?: string;
+  locationId?: string;
 }
 
 export interface PaginatedSupplies {
@@ -18,6 +20,8 @@ export interface PaginatedSupplies {
 
 export interface CreateSupplyDto {
   name: string;
+  categoryId?: string | null;
+  locationId?: string | null;
   unit?: string;
   inputQuantity?: number;
   outputQuantity?: number;
@@ -27,6 +31,8 @@ export interface CreateSupplyDto {
 
 export interface UpdateSupplyDto {
   name?: string;
+  categoryId?: string | null;
+  locationId?: string | null;
   unit?: string;
   inputQuantity?: number;
   outputQuantity?: number;

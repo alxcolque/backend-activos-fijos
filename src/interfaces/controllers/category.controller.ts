@@ -20,8 +20,8 @@ const deleteCategoryUseCase = new DeleteCategoryUseCase(categoryRepository);
 
 export class CategoryController {
   public static async getCategories(request: FastifyRequest, reply: FastifyReply) {
-    const { search } = request.query as { search?: string };
-    const categories = await getCategoriesUseCase.execute(search);
+    const { search, type } = request.query as { search?: string; type?: 'ASSET' | 'SUPPLY' };
+    const categories = await getCategoriesUseCase.execute(search, type);
     return reply.status(200).send(successResponse(categories, 'Categorías obtenidas correctamente.'));
   }
 

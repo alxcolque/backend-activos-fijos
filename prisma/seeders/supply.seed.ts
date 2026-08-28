@@ -3,6 +3,11 @@ import { PrismaClient } from '@prisma/client';
 export async function seedSupplies(prisma: PrismaClient): Promise<void> {
   console.log('🌱 Seeding Supplies (Materiales/Suministros)...');
 
+  const supplyCategory = await prisma.assetCategory.findFirst({
+    where: { type: 'SUPPLY' },
+  });
+  const firstLocation = await prisma.location.findFirst();
+
   const sampleSupplies = [
     {
       name: 'Lápiz',
@@ -11,6 +16,8 @@ export async function seedSupplies(prisma: PrismaClient): Promise<void> {
       outputQuantity: 0,
       entryDate: new Date('2026-07-26T00:00:00.000Z'),
       observations: 'De 50 unidades',
+      categoryId: supplyCategory?.id || null,
+      locationId: firstLocation?.id || null,
     },
     {
       name: 'Papel Bond A4 75g',
@@ -19,6 +26,8 @@ export async function seedSupplies(prisma: PrismaClient): Promise<void> {
       outputQuantity: 5,
       entryDate: new Date('2026-08-01T00:00:00.000Z'),
       observations: 'Marca Chamex 500 hojas',
+      categoryId: supplyCategory?.id || null,
+      locationId: firstLocation?.id || null,
     },
     {
       name: 'Bolígrafo Azul',
@@ -27,6 +36,8 @@ export async function seedSupplies(prisma: PrismaClient): Promise<void> {
       outputQuantity: 2,
       entryDate: new Date('2026-08-10T00:00:00.000Z'),
       observations: 'Caja de 12 unidades Faber-Castell',
+      categoryId: supplyCategory?.id || null,
+      locationId: firstLocation?.id || null,
     },
   ];
 

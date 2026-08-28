@@ -17,6 +17,7 @@ import { NotFoundError } from '../../../shared/errors/app-error';
 
 const projectRepository = RepositoryFactory.getProjectRepository();
 const assetProjectRepository = RepositoryFactory.getAssetProjectRepository();
+const supplyProjectRepository = RepositoryFactory.getSupplyProjectRepository();
 const assetRepository = RepositoryFactory.getAssetRepository();
 const getProjectsUseCase = new GetProjectsUseCase(projectRepository);
 const getProjectUseCase = new GetProjectUseCase(projectRepository);
@@ -75,8 +76,9 @@ export class ProjectController {
     }
 
     const assignments = await assetProjectRepository.findByProjectId(id, false);
+    const supplyAssignments = await supplyProjectRepository.findByProjectId(id);
 
-    const wordBuffer = await generateProjectWordReport(project, assignments, { pageSize, orientation });
+    const wordBuffer = await generateProjectWordReport(project, assignments, supplyAssignments, { pageSize, orientation });
 
     const safeName = project.name.replace(/[^a-zA-Z0-9_-]/g, '_');
     const filename = `Informe_Inventario_${safeName}.docx`;

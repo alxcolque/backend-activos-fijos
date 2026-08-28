@@ -9,6 +9,8 @@ import { IAssignmentRepository } from '../../domain/assignments/assignment.repos
 import { IDocumentRepository } from '../../domain/documents/document.repository.interface';
 import { IMaintenanceRepository } from '../../domain/maintenances/maintenance.repository.interface';
 import { ISupplyRepository } from '../../domain/supplies/supply.repository.interface';
+import { ISupplyProjectRepository } from '../../domain/supply-projects/supply-project.repository.interface';
+import { IAcquisitionRepository } from '../../domain/acquisitions/acquisition.repository.interface';
 import { ISettingRepository } from '../../domain/settings/setting.repository.interface';
 import { IReportRepository } from '../../domain/reports/report.repository.interface';
 import { IImportRepository } from '../../domain/import/import.repository.interface';
@@ -28,6 +30,8 @@ import { AssignmentRepository as PrismaAssignmentRepository } from '../repositor
 import { DocumentRepository as PrismaDocumentRepository } from '../repositories/document.repository';
 import { MaintenanceRepository as PrismaMaintenanceRepository } from '../repositories/maintenance.repository';
 import { SupplyRepository as PrismaSupplyRepository } from '../repositories/supply.repository';
+import { SupplyProjectRepository as PrismaSupplyProjectRepository } from '../repositories/supply-project.repository';
+import { AcquisitionRepository as PrismaAcquisitionRepository } from '../repositories/acquisition.repository';
 import { SettingRepository as PrismaSettingRepository } from '../repositories/setting.repository';
 import { ReportRepository as PrismaReportRepository } from '../repositories/report.repository';
 import { ImportRepository as PrismaImportRepository } from '../repositories/import.repository';
@@ -47,6 +51,8 @@ import { MySQLAssignmentRepository } from './mysql/repositories/mysql-assignment
 import { MySQLDocumentRepository } from './mysql/repositories/mysql-document.repository';
 import { MySQLMaintenanceRepository } from './mysql/repositories/mysql-maintenance.repository';
 import { MySQLSupplyRepository } from './mysql/repositories/mysql-supply.repository';
+import { MySQLSupplyProjectRepository } from './mysql/repositories/mysql-supply-project.repository';
+import { MySQLAcquisitionRepository } from './mysql/repositories/mysql-acquisition.repository';
 import { MySQLSettingRepository } from './mysql/repositories/mysql-setting.repository';
 import { MySQLReportRepository } from './mysql/repositories/mysql-report.repository';
 import { MySQLImportRepository } from './mysql/repositories/mysql-import.repository';
@@ -68,6 +74,7 @@ export class RepositoryFactory {
   public static getUserRepository(): IUserRepository {
     return isProduction ? new MySQLUserRepository() : new PrismaUserRepository();
   }
+
   public static getAuthRepository(): IAuthRepository {
     return isProduction ? new MySQLAuthRepository() : new PrismaAuthRepository();
   }
@@ -110,6 +117,14 @@ export class RepositoryFactory {
 
   public static getSupplyRepository(): ISupplyRepository {
     return isProduction ? new MySQLSupplyRepository() : new PrismaSupplyRepository();
+  }
+
+  public static getSupplyProjectRepository(): ISupplyProjectRepository {
+    return isProduction ? new MySQLSupplyProjectRepository() : new PrismaSupplyProjectRepository();
+  }
+
+  public static getAcquisitionRepository(): IAcquisitionRepository {
+    return isProduction ? new MySQLAcquisitionRepository() : new PrismaAcquisitionRepository();
   }
 
   public static getSettingRepository(): ISettingRepository {

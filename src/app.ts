@@ -13,6 +13,8 @@ import { assignmentRoutes } from './interfaces/routes/assignment.routes';
 import { documentRoutes } from './interfaces/routes/document.routes';
 import { maintenanceRoutes } from './interfaces/routes/maintenance.routes';
 import { supplyRoutes } from './interfaces/routes/supplies/supply.routes';
+import { supplyProjectRoutes } from './interfaces/routes/supply-project.routes';
+import { acquisitionRoutes } from './interfaces/routes/acquisition.routes';
 import { importRoutes } from './interfaces/routes/import.routes';
 import { reportRoutes } from './interfaces/routes/report.routes';
 import { settingRoutes } from './interfaces/routes/setting.routes';
@@ -29,32 +31,30 @@ import { registerStatic } from './plugins/static.plugin';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
-    logger: true,
+    logger: false,
+    disableRequestLogging: true,
     ajv: {
       customOptions: {
-        strict: false,
+        keywords: ['example'],
       },
     },
   });
 
-  // Global Error Handler
-  app.setErrorHandler(errorHandler);
-
-  // Plugins
-  await registerHelmet(app);
+  // Plugins globales
   await registerCors(app);
-  await registerSwagger(app);
+  await registerHelmet(app);
   await registerJwt(app);
   await registerMultipart(app);
+  await registerSwagger(app);
   await registerStatic(app);
-  await app.register(registerAuditLogPlugin);
+  await registerAuditLogPlugin(app);
 
-  // Health check a nivel raíz
-  await app.register(healthRoutes);
+  // Manejo global de errores
+  app.setErrorHandler(errorHandler);
 
-  // Función registradora de todas las rutas del sistema
+  // Registro de rutas API
   const registerApiRoutes = async (apiInstance: any) => {
-    await apiInstance.register(healthRoutes);
+    await apiInstance.register(healthRoutes, { prefix: '/health' });
     await apiInstance.register(authRoutes, { prefix: '/auth' });
     await apiInstance.register(dashboardRoutes, { prefix: '/dashboard' });
     await apiInstance.register(categoryRoutes, { prefix: '/categories' });
@@ -67,6 +67,8 @@ export async function buildApp(): Promise<FastifyInstance> {
     await apiInstance.register(documentRoutes, { prefix: '/documents' });
     await apiInstance.register(maintenanceRoutes, { prefix: '/maintenances' });
     await apiInstance.register(supplyRoutes, { prefix: '/supplies' });
+    await apiInstance.register(supplyProjectRoutes, { prefix: '/supply-projects' });
+    await apiInstance.register(acquisitionRoutes, { prefix: '/acquisitions' });
     await apiInstance.register(importRoutes, { prefix: '/import' });
     await apiInstance.register(reportRoutes, { prefix: '/reports' });
     await apiInstance.register(settingRoutes, { prefix: '/settings' });
@@ -76,11 +78,10 @@ export async function buildApp(): Promise<FastifyInstance> {
   };
 
   // 1. Ruta estándar única /api (Recomendado en Producción)
-  await app.register(registerApiRoutes, { prefix: '/api' });
+  app.register(registerApiRoutes, { prefix: '/api' });
 
-  // 2. Compatibilidad con versiones previas (/api/v1 y /v1)
-  await app.register(registerApiRoutes, { prefix: '/api/v1' });
-  await app.register(registerApiRoutes, { prefix: '/v1' });
+  // 2. Compatibilidad retroactiva directa para rutas raíz
+  app.register(registerApiRoutes);
 
   return app;
 }

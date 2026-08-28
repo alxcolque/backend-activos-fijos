@@ -26,6 +26,7 @@ export interface GenerateWordReportOptions {
 export async function generateProjectWordReport(
   project: { name: string },
   assignments: any[],
+  supplyAssignments: any[] = [],
   options: GenerateWordReportOptions = {},
 ): Promise<Buffer> {
   const pageSize = options.pageSize || 'carta';
@@ -133,9 +134,9 @@ export async function generateProjectWordReport(
     ],
   });
 
-  // Párrafo descriptivo según diseño limpio sin resaltado ni corchetes
+  // Párrafo introductorio
   const introParagraph = new Paragraph({
-    spacing: { before: 360, after: 240, line: 320 },
+    spacing: { before: 360, after: 200, line: 320 },
     children: [
       new TextRun({
         text: 'En la Ciudad de Oruro, en fecha ',
@@ -149,7 +150,7 @@ export async function generateProjectWordReport(
         font: 'Arial',
       }),
       new TextRun({
-        text: ' se realizó la verificación y registro de los activos asignados al ',
+        text: ' se realizó la verificación y registro de los bienes y suministros asignados al ',
         size: 22,
         font: 'Arial',
       }),
@@ -167,11 +168,26 @@ export async function generateProjectWordReport(
     ],
   });
 
-  // Construcción de la Tabla de Activos ([TABLA])
-  const tableRows: TableRow[] = [];
+  // ==========================================
+  // 1. SUBTÍTULO Y TABLA DE ACTIVOS FIJOS
+  // ==========================================
+  const assetsSubtitle = new Paragraph({
+    spacing: { before: 240, after: 120 },
+    children: [
+      new TextRun({
+        text: 'DETALLE DE ACTIVOS',
+        bold: true,
+        size: 24, // 12pt
+        font: 'Arial',
+        color: '1E3A8A', // Azul Institucional
+      }),
+    ],
+  });
 
-  // Encabezado de Tabla
-  tableRows.push(
+  const assetRows: TableRow[] = [];
+
+  // Encabezado Tabla Activos
+  assetRows.push(
     new TableRow({
       tableHeader: true,
       children: [
@@ -214,9 +230,9 @@ export async function generateProjectWordReport(
     })
   );
 
-  // Filas de Datos
+  // Filas de Datos de Activos
   if (assignments.length === 0) {
-    tableRows.push(
+    assetRows.push(
       new TableRow({
         children: [
           new TableCell({
@@ -268,7 +284,7 @@ export async function generateProjectWordReport(
               new TextRun({
                 text: `Obs: ${obsText}`,
                 italics: true,
-                size: 15, // Letras pequeñas (7.5pt)
+                size: 15,
                 color: '64748B',
                 font: 'Arial',
               }),
@@ -277,7 +293,7 @@ export async function generateProjectWordReport(
         );
       }
 
-      tableRows.push(
+      assetRows.push(
         new TableRow({
           children: [
             new TableCell({
@@ -334,7 +350,7 @@ export async function generateProjectWordReport(
     });
   }
 
-  const mainTable = new Table({
+  const assetsTable = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     borders: {
       top: { style: BorderStyle.SINGLE, size: 4, color: 'CBD5E1' },
@@ -344,7 +360,203 @@ export async function generateProjectWordReport(
       insideHorizontal: { style: BorderStyle.SINGLE, size: 4, color: 'E2E8F0' },
       insideVertical: { style: BorderStyle.SINGLE, size: 4, color: 'E2E8F0' },
     },
-    rows: tableRows,
+    rows: assetRows,
+  });
+
+  // ==========================================
+  // 2. SUBTÍTULO Y TABLA DE SUMINISTROS
+  // ==========================================
+  const suppliesSubtitle = new Paragraph({
+    spacing: { before: 400, after: 120 },
+    children: [
+      new TextRun({
+        text: 'DETALLE DE SUMINISTROS',
+        bold: true,
+        size: 24, // 12pt
+        font: 'Arial',
+        color: '065F46', // Verde Esmeralda Institucional
+      }),
+    ],
+  });
+
+  const supplyRows: TableRow[] = [];
+
+  // Encabezado Tabla Suministros
+  supplyRows.push(
+    new TableRow({
+      tableHeader: true,
+      children: [
+        new TableCell({
+          width: { size: 6, type: WidthType.PERCENTAGE },
+          shading: { fill: '065F46', type: ShadingType.CLEAR, color: 'auto' },
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Nº', bold: true, color: 'FFFFFF', size: 18, font: 'Arial' })] })],
+        }),
+        new TableCell({
+          width: { size: 28, type: WidthType.PERCENTAGE },
+          shading: { fill: '065F46', type: ShadingType.CLEAR, color: 'auto' },
+          children: [new Paragraph({ alignment: AlignmentType.LEFT, children: [new TextRun({ text: 'Material / Suministro', bold: true, color: 'FFFFFF', size: 18, font: 'Arial' })] })],
+        }),
+        new TableCell({
+          width: { size: 18, type: WidthType.PERCENTAGE },
+          shading: { fill: '065F46', type: ShadingType.CLEAR, color: 'auto' },
+          children: [new Paragraph({ alignment: AlignmentType.LEFT, children: [new TextRun({ text: 'Categoría', bold: true, color: 'FFFFFF', size: 18, font: 'Arial' })] })],
+        }),
+        new TableCell({
+          width: { size: 16, type: WidthType.PERCENTAGE },
+          shading: { fill: '065F46', type: ShadingType.CLEAR, color: 'auto' },
+          children: [new Paragraph({ alignment: AlignmentType.LEFT, children: [new TextRun({ text: 'Ubicación', bold: true, color: 'FFFFFF', size: 18, font: 'Arial' })] })],
+        }),
+        new TableCell({
+          width: { size: 10, type: WidthType.PERCENTAGE },
+          shading: { fill: '065F46', type: ShadingType.CLEAR, color: 'auto' },
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Cantidad', bold: true, color: 'FFFFFF', size: 18, font: 'Arial' })] })],
+        }),
+        new TableCell({
+          width: { size: 11, type: WidthType.PERCENTAGE },
+          shading: { fill: '065F46', type: ShadingType.CLEAR, color: 'auto' },
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'F. Asignación', bold: true, color: 'FFFFFF', size: 18, font: 'Arial' })] })],
+        }),
+        new TableCell({
+          width: { size: 11, type: WidthType.PERCENTAGE },
+          shading: { fill: '065F46', type: ShadingType.CLEAR, color: 'auto' },
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Estado', bold: true, color: 'FFFFFF', size: 18, font: 'Arial' })] })],
+        }),
+      ],
+    })
+  );
+
+  // Filas de Datos de Suministros
+  if (supplyAssignments.length === 0) {
+    supplyRows.push(
+      new TableRow({
+        children: [
+          new TableCell({
+            columnSpan: 7,
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [new TextRun({ text: 'No se encontraron suministros o materiales asignados a este proyecto.', italics: true, size: 20, font: 'Arial' })],
+              }),
+            ],
+          }),
+        ],
+      })
+    );
+  } else {
+    supplyAssignments.forEach((item, index) => {
+      const isEven = index % 2 === 0;
+      const fillBg = isEven ? 'FFFFFF' : 'F8FAFC';
+      const isReleased = !!item.releasedAt;
+
+      const timeZone = env.TZ || process.env.TZ || 'America/La_Paz';
+      const dateAssigned = item.assignedAt
+        ? new Date(item.assignedAt).toLocaleDateString('es-BO', { timeZone })
+        : '—';
+
+      const statusText = isReleased ? 'Liberado' : 'Vigente';
+
+      const obsText = (
+        item.observations ||
+        (item.supply as any)?.observations ||
+        ''
+      ).trim();
+
+      const supplyCellParagraphs: Paragraph[] = [
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          children: [
+            new TextRun({ text: item.supply?.name || 'Suministro', bold: true, size: 18, font: 'Arial' }),
+          ],
+        }),
+      ];
+
+      if (obsText) {
+        supplyCellParagraphs.push(
+          new Paragraph({
+            alignment: AlignmentType.LEFT,
+            children: [
+              new TextRun({
+                text: `Obs: ${obsText}`,
+                italics: true,
+                size: 15,
+                color: '64748B',
+                font: 'Arial',
+              }),
+            ],
+          })
+        );
+      }
+
+      const qtyText = `${item.quantity || 0} ${item.supply?.unit || 'PZA'}`;
+
+      supplyRows.push(
+        new TableRow({
+          children: [
+            new TableCell({
+              width: { size: 6, type: WidthType.PERCENTAGE },
+              shading: { fill: fillBg, type: ShadingType.CLEAR, color: 'auto' },
+              children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `${index + 1}`, size: 18, font: 'Arial' })] })],
+            }),
+            new TableCell({
+              width: { size: 28, type: WidthType.PERCENTAGE },
+              shading: { fill: fillBg, type: ShadingType.CLEAR, color: 'auto' },
+              children: supplyCellParagraphs,
+            }),
+            new TableCell({
+              width: { size: 18, type: WidthType.PERCENTAGE },
+              shading: { fill: fillBg, type: ShadingType.CLEAR, color: 'auto' },
+              children: [new Paragraph({ alignment: AlignmentType.LEFT, children: [new TextRun({ text: item.supply?.category?.name || 'Sin categoría', size: 18, font: 'Arial' })] })],
+            }),
+            new TableCell({
+              width: { size: 16, type: WidthType.PERCENTAGE },
+              shading: { fill: fillBg, type: ShadingType.CLEAR, color: 'auto' },
+              children: [new Paragraph({ alignment: AlignmentType.LEFT, children: [new TextRun({ text: item.supply?.location?.name || 'Sin ubicación', size: 18, font: 'Arial' })] })],
+            }),
+            new TableCell({
+              width: { size: 10, type: WidthType.PERCENTAGE },
+              shading: { fill: fillBg, type: ShadingType.CLEAR, color: 'auto' },
+              children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: qtyText, bold: true, size: 18, font: 'Arial' })] })],
+            }),
+            new TableCell({
+              width: { size: 11, type: WidthType.PERCENTAGE },
+              shading: { fill: fillBg, type: ShadingType.CLEAR, color: 'auto' },
+              children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: dateAssigned, size: 18, font: 'Arial' })] })],
+            }),
+            new TableCell({
+              width: { size: 11, type: WidthType.PERCENTAGE },
+              shading: { fill: fillBg, type: ShadingType.CLEAR, color: 'auto' },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [
+                    new TextRun({
+                      text: statusText,
+                      bold: true,
+                      color: isReleased ? '475569' : '166534',
+                      size: 18,
+                      font: 'Arial',
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          ],
+        })
+      );
+    });
+  }
+
+  const suppliesTable = new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: {
+      top: { style: BorderStyle.SINGLE, size: 4, color: 'CBD5E1' },
+      bottom: { style: BorderStyle.SINGLE, size: 4, color: 'CBD5E1' },
+      left: { style: BorderStyle.SINGLE, size: 4, color: 'CBD5E1' },
+      right: { style: BorderStyle.SINGLE, size: 4, color: 'CBD5E1' },
+      insideHorizontal: { style: BorderStyle.SINGLE, size: 4, color: 'E2E8F0' },
+      insideVertical: { style: BorderStyle.SINGLE, size: 4, color: 'E2E8F0' },
+    },
+    rows: supplyRows,
   });
 
   const doc = new Document({
@@ -365,7 +577,14 @@ export async function generateProjectWordReport(
             },
           },
         },
-        children: [headerTable, introParagraph, mainTable],
+        children: [
+          headerTable,
+          introParagraph,
+          assetsSubtitle,
+          assetsTable,
+          suppliesSubtitle,
+          suppliesTable,
+        ],
       },
     ],
   });

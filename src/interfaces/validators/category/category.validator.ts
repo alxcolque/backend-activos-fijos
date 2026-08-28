@@ -6,6 +6,7 @@ export const createCategorySchema = z.object({
     .min(2, 'El nombre debe tener al menos 2 caracteres.')
     .max(100, 'El nombre no puede exceder los 100 caracteres.'),
   description: z.string().optional(),
+  type: z.enum(['ASSET', 'SUPPLY']).optional().default('ASSET'),
   usefulLife: z
     .union([z.string(), z.number()])
     .optional()
@@ -20,6 +21,7 @@ export const updateCategorySchema = z.object({
     .max(100, 'El nombre no puede exceder los 100 caracteres.')
     .optional(),
   description: z.string().optional(),
+  type: z.enum(['ASSET', 'SUPPLY']).optional(),
   usefulLife: z
     .union([z.string(), z.number()])
     .optional()

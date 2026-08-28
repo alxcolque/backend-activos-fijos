@@ -20,6 +20,7 @@ CREATE TABLE `asset_categories` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `description` TEXT NULL,
+    `type` VARCHAR(191) NOT NULL DEFAULT 'ASSET',
     `usefulLife` INTEGER NOT NULL DEFAULT 0,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
@@ -186,6 +187,8 @@ CREATE TABLE `asset_maintenances` (
 CREATE TABLE `supplies` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
+    `category_id` VARCHAR(191) NULL,
+    `location_id` VARCHAR(191) NULL,
     `unit` VARCHAR(191) NOT NULL DEFAULT 'PZA',
     `input_quantity` INTEGER NOT NULL DEFAULT 0,
     `output_quantity` INTEGER NOT NULL DEFAULT 0,
@@ -194,6 +197,8 @@ CREATE TABLE `supplies` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
+    INDEX `supplies_category_id_idx`(`category_id`),
+    INDEX `supplies_location_id_idx`(`location_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -203,6 +208,9 @@ CREATE TABLE `supply_projects` (
     `supply_id` VARCHAR(191) NOT NULL,
     `project_id` VARCHAR(191) NOT NULL,
     `quantity` INTEGER NOT NULL DEFAULT 1,
+    `output_quantity` INTEGER NOT NULL DEFAULT 0,
+    `assigned_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `released_at` DATETIME(3) NULL,
     `observations` TEXT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
@@ -282,6 +290,12 @@ ALTER TABLE `asset_documents` ADD CONSTRAINT `asset_documents_assetId_fkey` FORE
 
 -- AddForeignKey
 ALTER TABLE `asset_maintenances` ADD CONSTRAINT `asset_maintenances_assetId_fkey` FOREIGN KEY (`assetId`) REFERENCES `assets`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `supplies` ADD CONSTRAINT `supplies_category_id_fkey` FOREIGN KEY (`category_id`) REFERENCES `asset_categories`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `supplies` ADD CONSTRAINT `supplies_location_id_fkey` FOREIGN KEY (`location_id`) REFERENCES `locations`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `supply_projects` ADD CONSTRAINT `supply_projects_supply_id_fkey` FOREIGN KEY (`supply_id`) REFERENCES `supplies`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

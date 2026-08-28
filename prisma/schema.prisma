@@ -61,11 +61,13 @@ model AssetCategory {
   id          String   @id @default(uuid())
   name        String   @unique
   description String?  @db.Text
+  type        String   @default("ASSET")
   usefulLife  Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   assets Asset[]
+  supplies Supply[]
 
   @@map("asset_categories")
 }
@@ -95,6 +97,7 @@ model Location {
   children Location[] @relation("LocationHierarchy")
 
   assets Asset[]
+  supplies Supply[]
 
   @@index([parentId])
   @@index([name])
@@ -243,6 +246,8 @@ model AssetMaintenance {
 model Supply {
   id             String    @id @default(uuid())
   name           String
+  categoryId     String?   @map("category_id")
+  locationId     String?   @map("location_id")
   unit           String    @default("PZA")
   inputQuantity  Int       @default(0) @map("input_quantity")
   outputQuantity Int       @default(0) @map("output_quantity")
@@ -251,19 +256,26 @@ model Supply {
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
+  category       AssetCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  location       Location?       @relation(fields: [locationId], references: [id], onDelete: SetNull)
   supplyProjects SupplyProject[]
 
+  @@index([categoryId])
+  @@index([locationId])
   @@map("supplies")
 }
 
 model SupplyProject {
-  id           String   @id @default(uuid())
-  supplyId     String   @map("supply_id")
-  projectId    String   @map("project_id")
-  quantity     Int      @default(1)
-  observations String?  @db.Text
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id             String    @id @default(uuid())
+  supplyId       String    @map("supply_id")
+  projectId      String    @map("project_id")
+  quantity       Int       @default(1)
+  outputQuantity Int       @default(0) @map("output_quantity")
+  assignedAt     DateTime  @default(now()) @map("assigned_at")
+  releasedAt     DateTime? @map("released_at")
+  observations   String?   @db.Text
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
   supply  Supply  @relation(fields: [supplyId], references: [id], onDelete: Cascade)
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)

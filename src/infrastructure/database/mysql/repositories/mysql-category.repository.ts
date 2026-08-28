@@ -8,18 +8,28 @@ import {
 } from '../../../../domain/category/category.repository.interface';
 
 export class MySQLCategoryRepository implements ICategoryRepository {
-  async findAll(search?: string): Promise<CategoryWithCount[]> {
+  async findAll(search?: string, type?: 'ASSET' | 'SUPPLY'): Promise<CategoryWithCount[]> {
     let sql = `
-      SELECT c.id, c.name, c.description, c.usefulLife, c.createdAt, c.updatedAt,
+      SELECT c.id, c.name, c.description, c.type, c.usefulLife, c.createdAt, c.updatedAt,
              COUNT(a.id) AS totalAssets
       FROM asset_categories c
       LEFT JOIN assets a ON a.categoryId = c.id AND a.deletedAt IS NULL
     `;
+    const whereClause: string[] = [];
     const params: any[] = [];
 
     if (search) {
-      sql += ` WHERE c.name LIKE ? OR c.description LIKE ?`;
+      whereClause.push(`(c.name LIKE ? OR c.description LIKE ?)`);
       params.push(`%${search}%`, `%${search}%`);
+    }
+
+    if (type) {
+      whereClause.push(`c.type = ?`);
+      params.push(type);
+    }
+
+    if (whereClause.length > 0) {
+      sql += ` WHERE ${whereClause.join(' AND ')}`;
     }
 
     sql += ` GROUP BY c.id ORDER BY c.name ASC`;
@@ -30,6 +40,7 @@ export class MySQLCategoryRepository implements ICategoryRepository {
       id: row.id,
       name: row.name,
       description: row.description,
+      type: (row.type || 'ASSET') as 'ASSET' | 'SUPPLY',
       usefulLife: Number(row.usefulLife),
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
@@ -39,7 +50,7 @@ export class MySQLCategoryRepository implements ICategoryRepository {
 
   async findById(id: string): Promise<CategoryWithCount | null> {
     const sql = `
-      SELECT c.id, c.name, c.description, c.usefulLife, c.createdAt, c.updatedAt,
+      SELECT c.id, c.name, c.description, c.type, c.usefulLife, c.createdAt, c.updatedAt,
              COUNT(a.id) AS totalAssets
       FROM asset_categories c
       LEFT JOIN assets a ON a.categoryId = c.id AND a.deletedAt IS NULL
@@ -56,6 +67,7 @@ export class MySQLCategoryRepository implements ICategoryRepository {
       id: row.id,
       name: row.name,
       description: row.description,
+      type: (row.type || 'ASSET') as 'ASSET' | 'SUPPLY',
       usefulLife: Number(row.usefulLife),
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
@@ -65,7 +77,7 @@ export class MySQLCategoryRepository implements ICategoryRepository {
 
   async findByName(name: string): Promise<AssetCategory | null> {
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(
-      'SELECT id, name, description, usefulLife, createdAt, updatedAt FROM asset_categories WHERE name = ? LIMIT 1',
+      'SELECT id, name, description, type, usefulLife, createdAt, updatedAt FROM asset_categories WHERE name = ? LIMIT 1',
       [name],
     );
 
@@ -75,27 +87,30 @@ export class MySQLCategoryRepository implements ICategoryRepository {
       id: row.id,
       name: row.name,
       description: row.description,
+      type: (row.type || 'ASSET') as 'ASSET' | 'SUPPLY',
       usefulLife: Number(row.usefulLife),
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
     };
   }
 
-  async create(data: { name: string; description?: string; usefulLife?: number }): Promise<AssetCategory> {
+  async create(data: { name: string; description?: string; type?: 'ASSET' | 'SUPPLY'; usefulLife?: number }): Promise<AssetCategory> {
     const id = uuidv4();
     const now = new Date();
     const description = data.description || null;
+    const type = data.type || 'ASSET';
     const usefulLife = data.usefulLife ?? 0;
 
     await mysqlPool.execute(
-      'INSERT INTO asset_categories (id, name, description, usefulLife, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)',
-      [id, data.name, description, usefulLife, now, now],
+      'INSERT INTO asset_categories (id, name, description, type, usefulLife, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [id, data.name, description, type, usefulLife, now, now],
     );
 
     return {
       id,
       name: data.name,
       description,
+      type,
       usefulLife,
       createdAt: now,
       updatedAt: now,
@@ -104,7 +119,7 @@ export class MySQLCategoryRepository implements ICategoryRepository {
 
   async update(
     id: string,
-    data: { name?: string; description?: string; usefulLife?: number },
+    data: { name?: string; description?: string; type?: 'ASSET' | 'SUPPLY'; usefulLife?: number },
   ): Promise<AssetCategory> {
     const now = new Date();
     const updates: string[] = ['updatedAt = ?'];
@@ -117,6 +132,10 @@ export class MySQLCategoryRepository implements ICategoryRepository {
     if (data.description !== undefined) {
       updates.push('description = ?');
       params.push(data.description);
+    }
+    if (data.type !== undefined) {
+      updates.push('type = ?');
+      params.push(data.type);
     }
     if (data.usefulLife !== undefined) {
       updates.push('usefulLife = ?');
@@ -139,6 +158,7 @@ export class MySQLCategoryRepository implements ICategoryRepository {
       id: updated.id,
       name: updated.name,
       description: updated.description,
+      type: updated.type,
       usefulLife: updated.usefulLife,
       createdAt: updated.createdAt,
       updatedAt: updated.updatedAt,

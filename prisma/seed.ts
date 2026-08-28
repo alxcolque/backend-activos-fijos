@@ -5,6 +5,7 @@ import {
   seedAssetStatuses,
   seedLocations,
   seedSupplies,
+  seedAcquisitions,
 } from './seeders';
 
 const prisma = new PrismaClient();
@@ -17,6 +18,7 @@ async function main() {
   await seedAssetStatuses(prisma);
   await seedLocations(prisma);
   await seedSupplies(prisma);
+  await seedAcquisitions(prisma);
 
   console.log('🎉 Database seeded successfully.');
 }
