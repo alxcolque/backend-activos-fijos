@@ -9,9 +9,9 @@ import {
 import { prisma } from '../database/prisma.service';
 
 export class AcquisitionRepository implements IAcquisitionRepository {
-  private client: PrismaClient;
+  private client: any;
 
-  constructor(client: PrismaClient = prisma) {
+  constructor(client: any = prisma) {
     this.client = client;
   }
 
@@ -105,7 +105,7 @@ export class AcquisitionRepository implements IAcquisitionRepository {
     ]);
 
     return {
-      data: rawItems.map((item) => this.mapToEntity(item)),
+      data: rawItems.map((item: any) => this.mapToEntity(item)),
       total,
     };
   }

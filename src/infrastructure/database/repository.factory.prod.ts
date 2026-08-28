@@ -15,6 +15,8 @@ import { IAssignmentRepository } from '../../domain/assignments/assignment.repos
 import { IDocumentRepository } from '../../domain/documents/document.repository.interface';
 import { IMaintenanceRepository } from '../../domain/maintenances/maintenance.repository.interface';
 import { ISupplyRepository } from '../../domain/supplies/supply.repository.interface';
+import { ISupplyProjectRepository } from '../../domain/supply-projects/supply-project.repository.interface';
+import { IAcquisitionRepository } from '../../domain/acquisitions/acquisition.repository.interface';
 import { ISettingRepository } from '../../domain/settings/setting.repository.interface';
 import { IReportRepository } from '../../domain/reports/report.repository.interface';
 import { IImportRepository } from '../../domain/import/import.repository.interface';
@@ -34,6 +36,8 @@ import { MySQLAssignmentRepository } from './mysql/repositories/mysql-assignment
 import { MySQLDocumentRepository } from './mysql/repositories/mysql-document.repository';
 import { MySQLMaintenanceRepository } from './mysql/repositories/mysql-maintenance.repository';
 import { MySQLSupplyRepository } from './mysql/repositories/mysql-supply.repository';
+import { MySQLSupplyProjectRepository } from './mysql/repositories/mysql-supply-project.repository';
+import { MySQLAcquisitionRepository } from './mysql/repositories/mysql-acquisition.repository';
 import { MySQLSettingRepository } from './mysql/repositories/mysql-setting.repository';
 import { MySQLReportRepository } from './mysql/repositories/mysql-report.repository';
 import { MySQLImportRepository } from './mysql/repositories/mysql-import.repository';
@@ -49,6 +53,7 @@ export class RepositoryFactory {
   public static getUserRepository(): IUserRepository {
     return new MySQLUserRepository();
   }
+
   public static getAuthRepository(): IAuthRepository {
     return new MySQLAuthRepository();
   }
@@ -91,6 +96,14 @@ export class RepositoryFactory {
 
   public static getSupplyRepository(): ISupplyRepository {
     return new MySQLSupplyRepository();
+  }
+
+  public static getSupplyProjectRepository(): ISupplyProjectRepository {
+    return new MySQLSupplyProjectRepository();
+  }
+
+  public static getAcquisitionRepository(): IAcquisitionRepository {
+    return new MySQLAcquisitionRepository();
   }
 
   public static getSettingRepository(): ISettingRepository {
