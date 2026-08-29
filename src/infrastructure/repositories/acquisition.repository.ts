@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import { AcquisitionEntity } from '../../domain/acquisitions/acquisition.entity';
 import {
   IAcquisitionRepository,
@@ -12,7 +11,7 @@ export class AcquisitionRepository implements IAcquisitionRepository {
   private client: any;
 
   constructor(client: any = prisma) {
-    this.client = client;
+    this.client = client || prisma;
   }
 
   private mapToEntity(item: any): AcquisitionEntity {

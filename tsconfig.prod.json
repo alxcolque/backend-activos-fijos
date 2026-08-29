@@ -40,6 +40,8 @@
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/infrastructure/repositories/**/*",
+    "prisma/**/*"
   ]
 }
