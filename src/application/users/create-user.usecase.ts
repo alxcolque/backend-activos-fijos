@@ -17,6 +17,8 @@ export class CreateUserUseCase {
     return this.userRepository.create({
       email: input.email,
       fullName: input.fullName,
+      profession: input.profession,
+      projectId: input.projectId,
       password: hashedPassword,
       role: input.role || 'admin',
       isActive: input.isActive ?? true,

@@ -4,6 +4,7 @@ import {
   CreateAcquisitionDTO,
   UpdateAcquisitionDTO,
   QueryAcquisitionOptions,
+  CreateAcquisitionDetailDTO,
 } from '../../../../domain/acquisitions/acquisition.repository.interface';
 import { AcquisitionRepository } from '../../../repositories/acquisition.repository';
 
@@ -33,5 +34,13 @@ export class MySQLAcquisitionRepository implements IAcquisitionRepository {
 
   public async delete(id: string): Promise<boolean> {
     return this.repository.delete(id);
+  }
+
+  public async addDetail(dto: CreateAcquisitionDetailDTO): Promise<any> {
+    return this.repository.addDetail(dto);
+  }
+
+  public async deleteDetail(detailId: string): Promise<boolean> {
+    return this.repository.deleteDetail(detailId);
   }
 }

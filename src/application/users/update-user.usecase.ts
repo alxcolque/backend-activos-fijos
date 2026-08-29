@@ -27,6 +27,8 @@ export class UpdateUserUseCase {
     return this.userRepository.update(id, {
       email: input.email,
       fullName: input.fullName,
+      profession: input.profession,
+      projectId: input.projectId,
       password: hashedPassword,
       role: input.role,
       isActive: input.isActive,

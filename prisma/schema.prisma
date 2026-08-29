@@ -1,5 +1,3 @@
-// Prisma Schema para Sistema de Gestión de Activos Fijos COMIBOL
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,14 +8,23 @@ datasource db {
 }
 
 // ------------------------------------------------------
-// ENUMERACIONES
+// ENUMS
 // ------------------------------------------------------
 
 enum ProjectStatus {
+  PLANNING
   ACTIVE
-  FINISHED
   SUSPENDED
+  COMPLETED
   CANCELLED
+}
+
+enum DocumentType {
+  MANUAL
+  INVOICE
+  WARRANTY
+  REPORT
+  OTHER
 }
 
 enum MaintenanceType {
@@ -25,8 +32,7 @@ enum MaintenanceType {
   CORRECTIVE
 }
 
-enum DocumentType {
-  PHOTO
+enum DocumentCategory {
   MANUAL
   INVOICE
   WARRANTY
@@ -44,16 +50,19 @@ model User {
   password   String
   fullName   String
   profession String?
+  projectId  String?   @map("project_id")
   role       String    @default("admin")
   isActive   Boolean   @default(true)
   lastLogin  DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
   deliverAcquisitions  Acquisition[] @relation("UserDeliverAcquisitions")
-  projectAcquisitions  Acquisition[] @relation("UserProjectAcquisitions")
   checkoutAcquisitions Acquisition[] @relation("UserCheckoutAcquisitions")
 
+  @@index([projectId])
   @@map("users")
 }
 
@@ -66,7 +75,7 @@ model AssetCategory {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  assets Asset[]
+  assets   Asset[]
   supplies Supply[]
 
   @@map("asset_categories")
@@ -76,6 +85,7 @@ model AssetStatus {
   id          String   @id @default(uuid())
   name        String   @unique
   description String?  @db.Text
+  color       String?  @default("blue")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -86,21 +96,20 @@ model AssetStatus {
 
 model Location {
   id          String    @id @default(uuid())
-  parentId    String?
   name        String
+  code        String    @unique
   description String?   @db.Text
+  parentId    String?   @map("parent_id")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
-  parent   Location?  @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  parent   Location?  @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
   children Location[] @relation("LocationHierarchy")
-
-  assets Asset[]
+  assets   Asset[]
   supplies Supply[]
 
   @@index([parentId])
-  @@index([name])
   @@map("locations")
 }
 
@@ -117,9 +126,10 @@ model Project {
   updatedAt   DateTime      @updatedAt
   deletedAt   DateTime?
 
-  assetProjects      AssetProject[]
-  supplyProjects     SupplyProject[]
-  acquisitionDetails AcquisitionDetail[]
+  users          User[]
+  acquisitions   Acquisition[]
+  assetProjects  AssetProject[]
+  supplyProjects SupplyProject[]
 
   @@index([name])
   @@index([status])
@@ -156,10 +166,11 @@ model Asset {
   status   AssetStatus   @relation(fields: [statusId], references: [id])
   location Location      @relation(fields: [locationId], references: [id])
 
-  assetProjects AssetProject[]
-  assignments   AssetAssignment[]
-  documents     AssetDocument[]
-  maintenances  AssetMaintenance[]
+  assetProjects      AssetProject[]
+  assignments        AssetAssignment[]
+  documents          AssetDocument[]
+  maintenances       AssetMaintenance[]
+  acquisitionDetails AcquisitionDetail[]
 
   @@index([code])
   @@index([qrCode])
@@ -179,6 +190,8 @@ model AssetProject {
   assignedAt   DateTime  @default(now())
   releasedAt   DateTime?
   observations String?   @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   asset   Asset   @relation(fields: [assetId], references: [id], onDelete: Cascade)
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -256,9 +269,10 @@ model Supply {
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  category       AssetCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  location       Location?       @relation(fields: [locationId], references: [id], onDelete: SetNull)
-  supplyProjects SupplyProject[]
+  category           AssetCategory?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  location           Location?           @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  supplyProjects     SupplyProject[]
+  acquisitionDetails AcquisitionDetail[]
 
   @@index([categoryId])
   @@index([locationId])
@@ -288,20 +302,21 @@ model SupplyProject {
 model Acquisition {
   id             String    @id @default(uuid())
   userId         String    @map("user_id")
-  projectUserId  String?   @map("project_user_id")
+  projectId      String?   @map("project_id")
   checkoutUserId String?   @map("checkout_user_id")
   departureDate  DateTime? @map("departure_date")
+  type           String    @default("SUPPLY")
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  user         User   @relation("UserDeliverAcquisitions", fields: [userId], references: [id])
-  projectUser  User?  @relation("UserProjectAcquisitions", fields: [projectUserId], references: [id])
-  checkoutUser User?  @relation("UserCheckoutAcquisitions", fields: [checkoutUserId], references: [id])
+  user         User     @relation("UserDeliverAcquisitions", fields: [userId], references: [id])
+  project      Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  checkoutUser User?    @relation("UserCheckoutAcquisitions", fields: [checkoutUserId], references: [id])
 
   details AcquisitionDetail[]
 
   @@index([userId])
-  @@index([projectUserId])
+  @@index([projectId])
   @@index([checkoutUserId])
   @@map("acquisitions")
 }
@@ -309,17 +324,20 @@ model Acquisition {
 model AcquisitionDetail {
   id            String   @id @default(uuid())
   acquisitionId String   @map("acquisition_id")
-  projectId     String?  @map("project_id")
+  supplyId      String?  @map("supply_id")
+  assetId       String?  @map("asset_id")
   unit          String?
   quantity      Int      @default(1)
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
   acquisition Acquisition @relation(fields: [acquisitionId], references: [id], onDelete: Cascade)
-  project     Project?    @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  supply      Supply?     @relation(fields: [supplyId], references: [id], onDelete: SetNull)
+  asset       Asset?      @relation(fields: [assetId], references: [id], onDelete: SetNull)
 
   @@index([acquisitionId])
-  @@index([projectId])
+  @@index([supplyId])
+  @@index([assetId])
   @@map("acquisition_details")
 }
 

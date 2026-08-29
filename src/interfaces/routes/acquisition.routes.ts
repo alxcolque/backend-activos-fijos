@@ -11,4 +11,8 @@ export async function acquisitionRoutes(fastify: FastifyInstance) {
   fastify.put('/:id', AcquisitionController.updateAcquisition);
   fastify.patch('/:id', AcquisitionController.updateAcquisition);
   fastify.delete('/:id', AcquisitionController.deleteAcquisition);
+
+  // Rutas de Detalles (Insumos/Activos)
+  fastify.post('/:id/details', AcquisitionController.addDetail);
+  fastify.delete('/details/:detailId', AcquisitionController.deleteDetail);
 }

@@ -20,8 +20,27 @@ export interface IUserRepository {
   findAll(options: FindAllUsersOptions): Promise<PaginatedUsers>;
   findById(id: string): Promise<UserEntity | null>;
   findByEmail(email: string): Promise<UserEntity | null>;
-  create(data: { email: string; fullName: string; profession?: string | null; password: string; role?: UserRole; isActive?: boolean }): Promise<UserEntity>;
-  update(id: string, data: { email?: string; fullName?: string; profession?: string | null; password?: string; role?: UserRole; isActive?: boolean }): Promise<UserEntity>;
+  create(data: {
+    email: string;
+    fullName: string;
+    profession?: string | null;
+    projectId?: string | null;
+    password: string;
+    role?: UserRole;
+    isActive?: boolean;
+  }): Promise<UserEntity>;
+  update(
+    id: string,
+    data: {
+      email?: string;
+      fullName?: string;
+      profession?: string | null;
+      projectId?: string | null;
+      password?: string;
+      role?: UserRole;
+      isActive?: boolean;
+    }
+  ): Promise<UserEntity>;
   delete(id: string): Promise<boolean>;
   countActive(): Promise<number>;
 }

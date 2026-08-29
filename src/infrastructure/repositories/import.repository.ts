@@ -54,7 +54,7 @@ export class ImportRepository implements IImportRepository {
     if (anyLoc) return anyLoc.id;
 
     const newLoc = await prisma.location.create({
-      data: { name: 'COMIBOL', description: 'Oficina Central' },
+      data: { code: 'COMIBOL-MAIN', name: 'COMIBOL', description: 'Oficina Central' } as any,
     });
     return newLoc.id;
   }

@@ -5,12 +5,14 @@ CREATE TABLE `users` (
     `password` VARCHAR(191) NOT NULL,
     `fullName` VARCHAR(191) NOT NULL,
     `profession` VARCHAR(191) NULL,
+    `project_id` VARCHAR(191) NULL,
     `role` VARCHAR(191) NOT NULL DEFAULT 'admin',
     `isActive` BOOLEAN NOT NULL DEFAULT true,
     `lastLogin` DATETIME(3) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `users_project_id_idx`(`project_id`),
     UNIQUE INDEX `users_email_key`(`email`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -34,6 +36,7 @@ CREATE TABLE `asset_statuses` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `description` TEXT NULL,
+    `color` VARCHAR(191) NULL DEFAULT 'blue',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -44,15 +47,16 @@ CREATE TABLE `asset_statuses` (
 -- CreateTable
 CREATE TABLE `locations` (
     `id` VARCHAR(191) NOT NULL,
-    `parentId` VARCHAR(191) NULL,
     `name` VARCHAR(191) NOT NULL,
+    `code` VARCHAR(191) NOT NULL,
     `description` TEXT NULL,
+    `parent_id` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `deletedAt` DATETIME(3) NULL,
 
-    INDEX `locations_parentId_idx`(`parentId`),
-    INDEX `locations_name_idx`(`name`),
+    UNIQUE INDEX `locations_code_key`(`code`),
+    INDEX `locations_parent_id_idx`(`parent_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -224,14 +228,15 @@ CREATE TABLE `supply_projects` (
 CREATE TABLE `acquisitions` (
     `id` VARCHAR(191) NOT NULL,
     `user_id` VARCHAR(191) NOT NULL,
-    `project_user_id` VARCHAR(191) NULL,
+    `project_id` VARCHAR(191) NULL,
     `checkout_user_id` VARCHAR(191) NULL,
     `departure_date` DATETIME(3) NULL,
+    `type` VARCHAR(191) NOT NULL DEFAULT 'SUPPLY',
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
     INDEX `acquisitions_user_id_idx`(`user_id`),
-    INDEX `acquisitions_project_user_id_idx`(`project_user_id`),
+    INDEX `acquisitions_project_id_idx`(`project_id`),
     INDEX `acquisitions_checkout_user_id_idx`(`checkout_user_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -240,14 +245,16 @@ CREATE TABLE `acquisitions` (
 CREATE TABLE `acquisition_details` (
     `id` VARCHAR(191) NOT NULL,
     `acquisition_id` VARCHAR(191) NOT NULL,
-    `project_id` VARCHAR(191) NULL,
+    `supply_id` VARCHAR(191) NULL,
+    `asset_id` VARCHAR(191) NULL,
     `unit` VARCHAR(191) NULL,
     `quantity` INTEGER NOT NULL DEFAULT 1,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
     INDEX `acquisition_details_acquisition_id_idx`(`acquisition_id`),
-    INDEX `acquisition_details_project_id_idx`(`project_id`),
+    INDEX `acquisition_details_supply_id_idx`(`supply_id`),
+    INDEX `acquisition_details_asset_id_idx`(`asset_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -265,7 +272,7 @@ CREATE TABLE `system_settings` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `locations` ADD CONSTRAINT `locations_parentId_fkey` FOREIGN KEY (`parentId`) REFERENCES `locations`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `locations` ADD CONSTRAINT `locations_parent_id_fkey` FOREIGN KEY (`parent_id`) REFERENCES `locations`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `assets` ADD CONSTRAINT `assets_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `asset_categories`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -304,10 +311,13 @@ ALTER TABLE `supply_projects` ADD CONSTRAINT `supply_projects_supply_id_fkey` FO
 ALTER TABLE `supply_projects` ADD CONSTRAINT `supply_projects_project_id_fkey` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `users` ADD CONSTRAINT `users_project_id_fkey` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `acquisitions` ADD CONSTRAINT `acquisitions_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `acquisitions` ADD CONSTRAINT `acquisitions_project_user_id_fkey` FOREIGN KEY (`project_user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `acquisitions` ADD CONSTRAINT `acquisitions_project_id_fkey` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `acquisitions` ADD CONSTRAINT `acquisitions_checkout_user_id_fkey` FOREIGN KEY (`checkout_user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -316,4 +326,7 @@ ALTER TABLE `acquisitions` ADD CONSTRAINT `acquisitions_checkout_user_id_fkey` F
 ALTER TABLE `acquisition_details` ADD CONSTRAINT `acquisition_details_acquisition_id_fkey` FOREIGN KEY (`acquisition_id`) REFERENCES `acquisitions`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `acquisition_details` ADD CONSTRAINT `acquisition_details_project_id_fkey` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `acquisition_details` ADD CONSTRAINT `acquisition_details_supply_id_fkey` FOREIGN KEY (`supply_id`) REFERENCES `supplies`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `acquisition_details` ADD CONSTRAINT `acquisition_details_asset_id_fkey` FOREIGN KEY (`asset_id`) REFERENCES `assets`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

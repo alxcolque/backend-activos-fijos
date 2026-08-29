@@ -133,13 +133,14 @@ export class LocationRepository implements ILocationRepository {
     });
   }
 
-  async create(data: { parentId?: string | null; name: string; description?: string }): Promise<Location> {
+  async create(data: { parentId?: string | null; name: string; description?: string; code?: string }): Promise<Location> {
     return prisma.location.create({
       data: {
+        code: data.code || `LOC-${Date.now().toString(36).toUpperCase()}`,
         parentId: data.parentId || null,
         name: data.name,
         description: data.description || null,
-      },
+      } as any,
     });
   }
 

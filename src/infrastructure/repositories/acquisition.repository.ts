@@ -4,6 +4,7 @@ import {
   CreateAcquisitionDTO,
   UpdateAcquisitionDTO,
   QueryAcquisitionOptions,
+  CreateAcquisitionDetailDTO,
 } from '../../domain/acquisitions/acquisition.repository.interface';
 import { prisma } from '../database/prisma.service';
 
@@ -18,9 +19,10 @@ export class AcquisitionRepository implements IAcquisitionRepository {
     return new AcquisitionEntity({
       id: item.id,
       userId: item.userId,
-      projectUserId: item.projectUserId,
+      projectId: item.projectId,
       checkoutUserId: item.checkoutUserId,
       departureDate: item.departureDate,
+      type: item.type || 'SUPPLY',
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
       user: item.user
@@ -31,12 +33,10 @@ export class AcquisitionRepository implements IAcquisitionRepository {
             profession: item.user.profession,
           }
         : null,
-      projectUser: item.projectUser
+      project: item.project
         ? {
-            id: item.projectUser.id,
-            fullName: item.projectUser.fullName,
-            email: item.projectUser.email,
-            profession: item.projectUser.profession,
+            id: item.project.id,
+            name: item.project.name,
           }
         : null,
       checkoutUser: item.checkoutUser
@@ -51,12 +51,14 @@ export class AcquisitionRepository implements IAcquisitionRepository {
         ? item.details.map((d: any) => ({
             id: d.id,
             acquisitionId: d.acquisitionId,
-            projectId: d.projectId,
+            supplyId: d.supplyId,
+            assetId: d.assetId,
             unit: d.unit,
             quantity: d.quantity,
             createdAt: d.createdAt,
             updatedAt: d.updatedAt,
-            project: d.project ? { id: d.project.id, name: d.project.name } : null,
+            supply: d.supply ? { id: d.supply.id, name: d.supply.name, unit: d.supply.unit } : null,
+            asset: d.asset ? { id: d.asset.id, code: d.asset.code, name: d.asset.name } : null,
           }))
         : [],
     });
@@ -70,16 +72,18 @@ export class AcquisitionRepository implements IAcquisitionRepository {
     const where: any = {};
 
     if (options.userId) where.userId = options.userId;
-    if (options.projectUserId) where.projectUserId = options.projectUserId;
+    if (options.projectId) where.projectId = options.projectId;
     if (options.checkoutUserId) where.checkoutUserId = options.checkoutUserId;
+    if (options.type) where.type = options.type;
 
     if (options.search && options.search.trim()) {
       const q = options.search.trim();
       where.OR = [
         { user: { fullName: { contains: q } } },
-        { projectUser: { fullName: { contains: q } } },
+        { project: { name: { contains: q } } },
         { checkoutUser: { fullName: { contains: q } } },
-        { details: { some: { project: { name: { contains: q } } } } },
+        { details: { some: { supply: { name: { contains: q } } } } },
+        { details: { some: { asset: { name: { contains: q } } } } },
       ];
     }
 
@@ -91,11 +95,12 @@ export class AcquisitionRepository implements IAcquisitionRepository {
         orderBy: { createdAt: options.sortOrder === 'asc' ? 'asc' : 'desc' },
         include: {
           user: true,
-          projectUser: true,
+          project: true,
           checkoutUser: true,
           details: {
             include: {
-              project: true,
+              supply: true,
+              asset: true,
             },
           },
         },
@@ -114,11 +119,12 @@ export class AcquisitionRepository implements IAcquisitionRepository {
       where: { id },
       include: {
         user: true,
-        projectUser: true,
+        project: true,
         checkoutUser: true,
         details: {
           include: {
-            project: true,
+            supply: true,
+            asset: true,
           },
         },
       },
@@ -132,13 +138,15 @@ export class AcquisitionRepository implements IAcquisitionRepository {
     const created = await this.client.acquisition.create({
       data: {
         userId: dto.userId,
-        projectUserId: dto.projectUserId || null,
+        projectId: dto.projectId || null,
         checkoutUserId: dto.checkoutUserId || null,
         departureDate: dto.departureDate ? new Date(dto.departureDate) : null,
+        type: dto.type || 'SUPPLY',
         details: dto.details && dto.details.length > 0
           ? {
               create: dto.details.map((d) => ({
-                projectId: d.projectId || null,
+                supplyId: d.supplyId || null,
+                assetId: d.assetId || null,
                 unit: d.unit || 'PZA',
                 quantity: d.quantity || 1,
               })),
@@ -147,11 +155,12 @@ export class AcquisitionRepository implements IAcquisitionRepository {
       },
       include: {
         user: true,
-        projectUser: true,
+        project: true,
         checkoutUser: true,
         details: {
           include: {
-            project: true,
+            supply: true,
+            asset: true,
           },
         },
       },
@@ -161,7 +170,6 @@ export class AcquisitionRepository implements IAcquisitionRepository {
   }
 
   public async update(id: string, dto: UpdateAcquisitionDTO): Promise<AcquisitionEntity> {
-    // Si se pasan nuevos detalles, eliminar los existentes y reemplazarlos
     if (dto.details !== undefined) {
       await this.client.acquisitionDetail.deleteMany({
         where: { acquisitionId: id },
@@ -172,13 +180,15 @@ export class AcquisitionRepository implements IAcquisitionRepository {
       where: { id },
       data: {
         userId: dto.userId !== undefined ? dto.userId : undefined,
-        projectUserId: dto.projectUserId !== undefined ? dto.projectUserId : undefined,
+        projectId: dto.projectId !== undefined ? dto.projectId : undefined,
         checkoutUserId: dto.checkoutUserId !== undefined ? dto.checkoutUserId : undefined,
         departureDate: dto.departureDate !== undefined ? (dto.departureDate ? new Date(dto.departureDate) : null) : undefined,
+        type: dto.type !== undefined ? dto.type : undefined,
         details: dto.details && dto.details.length > 0
           ? {
               create: dto.details.map((d) => ({
-                projectId: d.projectId || null,
+                supplyId: d.supplyId || null,
+                assetId: d.assetId || null,
                 unit: d.unit || 'PZA',
                 quantity: d.quantity || 1,
               })),
@@ -187,11 +197,12 @@ export class AcquisitionRepository implements IAcquisitionRepository {
       },
       include: {
         user: true,
-        projectUser: true,
+        project: true,
         checkoutUser: true,
         details: {
           include: {
-            project: true,
+            supply: true,
+            asset: true,
           },
         },
       },
@@ -203,6 +214,30 @@ export class AcquisitionRepository implements IAcquisitionRepository {
   public async delete(id: string): Promise<boolean> {
     await this.client.acquisition.delete({
       where: { id },
+    });
+    return true;
+  }
+
+  public async addDetail(dto: CreateAcquisitionDetailDTO): Promise<any> {
+    const detail = await this.client.acquisitionDetail.create({
+      data: {
+        acquisitionId: dto.acquisitionId,
+        supplyId: dto.supplyId || null,
+        assetId: dto.assetId || null,
+        unit: dto.unit || 'PZA',
+        quantity: dto.quantity || 1,
+      },
+      include: {
+        supply: true,
+        asset: true,
+      },
+    });
+    return detail;
+  }
+
+  public async deleteDetail(detailId: string): Promise<boolean> {
+    await this.client.acquisitionDetail.delete({
+      where: { id: detailId },
     });
     return true;
   }

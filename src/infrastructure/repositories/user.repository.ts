@@ -7,6 +7,25 @@ import {
 import { UserEntity, UserRole } from '../../domain/users/user.entity';
 
 export class UserRepository implements IUserRepository {
+  private userSelect = {
+    id: true,
+    email: true,
+    fullName: true,
+    profession: true,
+    projectId: true,
+    role: true,
+    isActive: true,
+    lastLogin: true,
+    createdAt: true,
+    updatedAt: true,
+    project: {
+      select: {
+        id: true,
+        name: true,
+      },
+    },
+  };
+
   async findAll(options: FindAllUsersOptions): Promise<PaginatedUsers> {
     const page = Math.max(1, Number(options.page || 1));
     const limit = Math.max(1, Math.min(100, Number(options.limit || 10)));
@@ -28,24 +47,14 @@ export class UserRepository implements IUserRepository {
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          email: true,
-          fullName: true,
-          profession: true,
-          role: true,
-          isActive: true,
-          lastLogin: true,
-          createdAt: true,
-          updatedAt: true,
-        },
+        select: this.userSelect,
       }),
     ]);
 
     const totalPages = Math.ceil(total / limit) || 1;
 
     return {
-      data: users as UserEntity[],
+      data: users as unknown as UserEntity[],
       pagination: {
         total,
         page,
@@ -58,94 +67,72 @@ export class UserRepository implements IUserRepository {
   async findById(id: string): Promise<UserEntity | null> {
     const user = await prisma.user.findUnique({
       where: { id },
-      select: {
-        id: true,
-        email: true,
-        fullName: true,
-        profession: true,
-        role: true,
-        isActive: true,
-        lastLogin: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: this.userSelect,
     });
-    return user as UserEntity | null;
+    return user as unknown as UserEntity | null;
   }
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     const user = await prisma.user.findUnique({
       where: { email },
-      select: {
-        id: true,
-        email: true,
-        fullName: true,
-        profession: true,
-        role: true,
-        isActive: true,
-        lastLogin: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: this.userSelect,
     });
-    return user as UserEntity | null;
+    return user as unknown as UserEntity | null;
   }
 
-  async create(data: { email: string; fullName: string; profession?: string | null; password: string; role?: UserRole; isActive?: boolean }): Promise<UserEntity> {
+  async create(data: {
+    email: string;
+    fullName: string;
+    profession?: string | null;
+    projectId?: string | null;
+    password: string;
+    role?: UserRole;
+    isActive?: boolean;
+  }): Promise<UserEntity> {
     const user = await prisma.user.create({
       data: {
         email: data.email.toLowerCase().trim(),
         fullName: data.fullName.trim(),
         profession: data.profession ? data.profession.trim() : null,
+        projectId: data.projectId || null,
         password: data.password,
         role: data.role || 'admin',
         isActive: data.isActive ?? true,
       } as any,
-      select: {
-        id: true,
-        email: true,
-        fullName: true,
-        profession: true,
-        role: true,
-        isActive: true,
-        lastLogin: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: this.userSelect,
     });
 
-    return user as UserEntity;
+    return user as unknown as UserEntity;
   }
 
   async update(
     id: string,
-    data: { email?: string; fullName?: string; profession?: string | null; password?: string; role?: UserRole; isActive?: boolean },
+    data: {
+      email?: string;
+      fullName?: string;
+      profession?: string | null;
+      projectId?: string | null;
+      password?: string;
+      role?: UserRole;
+      isActive?: boolean;
+    }
   ): Promise<UserEntity> {
     const updateData: any = {};
     if (data.email !== undefined) updateData.email = data.email.toLowerCase().trim();
     if (data.fullName !== undefined) updateData.fullName = data.fullName.trim();
     if (data.profession !== undefined) updateData.profession = data.profession ? data.profession.trim() : null;
-    if (data.password !== undefined) updateData.password = data.password;
+    if (data.projectId !== undefined) updateData.projectId = data.projectId || null;
+    if (data.password !== undefined && data.password !== '') updateData.password = data.password;
     if (data.role !== undefined) updateData.role = data.role;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
     const user = await prisma.user.update({
       where: { id },
       data: updateData,
-      select: {
-        id: true,
-        email: true,
-        fullName: true,
-        profession: true,
-        role: true,
-        isActive: true,
-        lastLogin: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: this.userSelect,
     });
 
-    return user as UserEntity;
+    return user as unknown as UserEntity;
   }
 
   async delete(id: string): Promise<boolean> {

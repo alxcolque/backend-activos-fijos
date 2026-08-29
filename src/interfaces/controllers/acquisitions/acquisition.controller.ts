@@ -4,6 +4,7 @@ import {
   createAcquisitionSchema,
   updateAcquisitionSchema,
   queryAcquisitionSchema,
+  addAcquisitionDetailSchema,
 } from '../../validators/acquisitions/acquisition.validator';
 import { successResponse } from '../../../shared/utils/response.util';
 import { NotFoundError } from '../../../shared/errors/app-error';
@@ -73,5 +74,31 @@ export class AcquisitionController {
     await acquisitionRepo.delete(id);
 
     return reply.status(200).send(successResponse(null, 'Registro de personal eliminado correctamente.'));
+  }
+
+  public static async addDetail(request: FastifyRequest, reply: FastifyReply) {
+    const { id } = request.params as { id: string };
+    const validatedBody = addAcquisitionDetailSchema.parse(request.body);
+
+    const acquisition = await acquisitionRepo.findById(id);
+    if (!acquisition) {
+      throw new NotFoundError('Registro de personal no encontrado.');
+    }
+
+    const createdDetail = await acquisitionRepo.addDetail({
+      acquisitionId: id,
+      supplyId: validatedBody.supplyId,
+      assetId: validatedBody.assetId,
+      unit: validatedBody.unit,
+      quantity: validatedBody.quantity,
+    });
+
+    return reply.status(201).send(successResponse(createdDetail, 'Detalle agregado exitosamente.'));
+  }
+
+  public static async deleteDetail(request: FastifyRequest, reply: FastifyReply) {
+    const { detailId } = request.params as { detailId: string };
+    await acquisitionRepo.deleteDetail(detailId);
+    return reply.status(200).send(successResponse(null, 'Detalle eliminado correctamente.'));
   }
 }
