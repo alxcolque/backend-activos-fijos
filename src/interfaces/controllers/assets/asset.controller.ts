@@ -129,6 +129,13 @@ export class AssetController {
   }
 
   public static async downloadExcelReport(request: FastifyRequest, reply: FastifyReply) {
+    if ((request.user as any)?.role === 'guest') {
+      return reply.status(403).send({
+        success: false,
+        message: 'Acceso denegado. El usuario con rol invitado no tiene permiso para descargar reportes en Excel.',
+      });
+    }
+
     try {
       const query = (request.query as {
         search?: string;

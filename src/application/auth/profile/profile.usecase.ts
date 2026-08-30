@@ -15,7 +15,8 @@ export class ProfileUseCase {
       id: user.id,
       email: user.email,
       fullName: user.fullName,
-      role: (user as any).role || 'admin',
+      profession: (user as any).profession || null,
+      role: (user as any).role || 'operador',
     };
   }
 }

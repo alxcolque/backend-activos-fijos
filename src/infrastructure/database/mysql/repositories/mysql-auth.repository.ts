@@ -6,7 +6,7 @@ import { IAuthRepository } from '../../../../domain/auth/auth.repository.interfa
 export class MySQLAuthRepository implements IAuthRepository {
   async findByEmail(email: string): Promise<User | null> {
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(
-      'SELECT id, email, password, fullName, role, isActive, lastLogin, createdAt, updatedAt FROM users WHERE email = ? LIMIT 1',
+      'SELECT id, email, password, fullName, profession, role, isActive, lastLogin, createdAt, updatedAt FROM users WHERE email = ? LIMIT 1',
       [email.toLowerCase().trim()],
     );
 
@@ -17,7 +17,8 @@ export class MySQLAuthRepository implements IAuthRepository {
       email: row.email,
       password: row.password,
       fullName: row.fullName,
-      role: row.role || 'admin',
+      profession: row.profession || null,
+      role: row.role || 'operador',
       isActive: Boolean(row.isActive),
       lastLogin: row.lastLogin ? new Date(row.lastLogin) : null,
       createdAt: new Date(row.createdAt),
@@ -27,7 +28,7 @@ export class MySQLAuthRepository implements IAuthRepository {
 
   async findById(id: string): Promise<User | null> {
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(
-      'SELECT id, email, password, fullName, role, isActive, lastLogin, createdAt, updatedAt FROM users WHERE id = ? LIMIT 1',
+      'SELECT id, email, password, fullName, profession, role, isActive, lastLogin, createdAt, updatedAt FROM users WHERE id = ? LIMIT 1',
       [id],
     );
 
@@ -38,7 +39,8 @@ export class MySQLAuthRepository implements IAuthRepository {
       email: row.email,
       password: row.password,
       fullName: row.fullName,
-      role: row.role || 'admin',
+      profession: row.profession || null,
+      role: row.role || 'operador',
       isActive: Boolean(row.isActive),
       lastLogin: row.lastLogin ? new Date(row.lastLogin) : null,
       createdAt: new Date(row.createdAt),

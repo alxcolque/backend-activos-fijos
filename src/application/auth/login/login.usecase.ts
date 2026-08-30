@@ -47,7 +47,7 @@ export class LoginUseCase {
 
     await this.authRepository.updateLastLogin(user.id);
 
-    const userRole = (user as any).role || 'admin';
+    const userRole = (user as any).role || 'operador';
     const payload = { id: user.id, email: user.email, role: userRole };
 
     const accessToken = jwt.sign(payload, env.JWT_SECRET, {
@@ -68,6 +68,7 @@ export class LoginUseCase {
         id: user.id,
         email: user.email,
         fullName: user.fullName,
+        profession: (user as any).profession || null,
         role: userRole,
       },
     };

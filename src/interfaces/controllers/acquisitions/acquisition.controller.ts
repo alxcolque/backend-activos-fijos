@@ -107,6 +107,13 @@ export class AcquisitionController {
   }
 
   public static async downloadActaEntregaWord(request: FastifyRequest, reply: FastifyReply) {
+    if ((request.user as any)?.role === 'guest') {
+      return reply.status(403).send({
+        success: false,
+        message: 'Acceso denegado. El usuario con rol invitado no tiene permiso para descargar actas de entrega.',
+      });
+    }
+
     const { id } = request.params as { id: string };
     const acquisition = await acquisitionRepo.findById(id);
     if (!acquisition) {
@@ -126,6 +133,13 @@ export class AcquisitionController {
   }
 
   public static async processDevolucion(request: FastifyRequest, reply: FastifyReply) {
+    if ((request.user as any)?.role === 'guest') {
+      return reply.status(403).send({
+        success: false,
+        message: 'Acceso denegado. El usuario con rol invitado no tiene permiso para realizar devoluciones.',
+      });
+    }
+
     const { id } = request.params as { id: string };
     const { detailIds } = request.body as { detailIds: string[] };
 

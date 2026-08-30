@@ -63,6 +63,13 @@ export class ProjectController {
   }
 
   public static async downloadWordReport(request: FastifyRequest, reply: FastifyReply) {
+    if ((request.user as any)?.role === 'guest') {
+      return reply.status(403).send({
+        success: false,
+        message: 'Acceso denegado. El usuario con rol invitado no tiene permiso para descargar informes en Word.',
+      });
+    }
+
     const { id } = request.params as { id: string };
     const query = (request.query as { pageSize?: string; orientation?: string }) || {};
     const body = (request.body as { pageSize?: string; orientation?: string }) || {};
