@@ -156,15 +156,16 @@ export class MySQLLocationRepository implements ILocationRepository {
     }));
   }
 
-  async create(data: { parentId?: string | null; name: string; description?: string }): Promise<Location> {
+  async create(data: { parentId?: string | null; name: string; code?: string; description?: string }): Promise<Location> {
     const id = uuidv4();
     const now = new Date();
     const parentId = data.parentId || null;
+    const code = data.code || `LOC-${Date.now().toString(36).toUpperCase()}-${uuidv4().substring(0, 4).toUpperCase()}`;
     const description = data.description || null;
 
     await mysqlPool.execute(
-      'INSERT INTO locations (id, parent_id, name, description, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)',
-      [id, parentId, data.name, description, now, now],
+      'INSERT INTO locations (id, parent_id, name, code, description, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [id, parentId, data.name, code, description, now, now],
     );
 
     return {
