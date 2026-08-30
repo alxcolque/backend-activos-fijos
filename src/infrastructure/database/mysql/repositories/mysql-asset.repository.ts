@@ -141,7 +141,7 @@ export class MySQLAssetRepository implements IAssetRepository {
     };
   }
 
-  async findById(id: string): Promise<AssetDetail | null> {
+  async findById(id: string, calculationDate?: string): Promise<AssetDetail | null> {
     const sql = `
       SELECT a.*,
              c.name AS categoryName, c.usefulLife AS categoryUsefulLife,
@@ -161,7 +161,7 @@ export class MySQLAssetRepository implements IAssetRepository {
     const row = rows[0];
     const pVal = row.purchaseValue ? Number(row.purchaseValue) : 0;
     const uLife = row.categoryUsefulLife !== undefined && row.categoryUsefulLife !== null ? Number(row.categoryUsefulLife) : 0;
-    const fin = calculateFinancials(pVal, row.purchaseDate, uLife);
+    const fin = calculateFinancials(pVal, row.purchaseDate, uLife, calculationDate);
 
     const asset = this.mapRowToAsset(row);
 

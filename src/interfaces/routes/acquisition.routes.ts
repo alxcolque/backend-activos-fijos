@@ -15,4 +15,11 @@ export async function acquisitionRoutes(fastify: FastifyInstance) {
   // Rutas de Detalles (Insumos/Activos)
   fastify.post('/:id/details', AcquisitionController.addDetail);
   fastify.delete('/details/:detailId', AcquisitionController.deleteDetail);
+
+  // Descargar Acta de Entrega en Word (.docx)
+  fastify.get('/:id/acta-entrega', AcquisitionController.downloadActaEntregaWord);
+  fastify.post('/:id/acta-entrega', AcquisitionController.downloadActaEntregaWord);
+
+  // Procesar Devolución de Activos y generar Acta de Devolución (.docx)
+  fastify.post('/:id/devolucion', AcquisitionController.processDevolucion);
 }

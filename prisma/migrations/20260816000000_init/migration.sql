@@ -129,6 +129,8 @@ CREATE TABLE `asset_projects` (
     `assignedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `releasedAt` DATETIME(3) NULL,
     `observations` TEXT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
     INDEX `asset_projects_assetId_idx`(`assetId`),
     INDEX `asset_projects_projectId_idx`(`projectId`),

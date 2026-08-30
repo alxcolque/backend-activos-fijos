@@ -41,7 +41,8 @@ export class AssetController {
 
   public static async getAssetById(request: FastifyRequest, reply: FastifyReply) {
     const { id } = request.params as { id: string };
-    const asset = await getAssetUseCase.execute(id);
+    const { calculationDate } = (request.query as { calculationDate?: string }) || {};
+    const asset = await getAssetUseCase.execute(id, calculationDate);
     return reply.status(200).send(successResponse(asset));
   }
 
@@ -135,6 +136,8 @@ export class AssetController {
         status?: string;
         location?: string;
         calculationDate?: string;
+        currency?: string;
+        exchangeRate?: number;
       }) || {};
 
       const body = (request.body as {
@@ -143,6 +146,8 @@ export class AssetController {
         status?: string;
         location?: string;
         calculationDate?: string;
+        currency?: string;
+        exchangeRate?: number;
       }) || {};
 
       const search = query.search || body.search || undefined;
@@ -150,6 +155,8 @@ export class AssetController {
       const status = query.status || body.status || undefined;
       const location = query.location || body.location || undefined;
       const calculationDate = query.calculationDate || body.calculationDate || undefined;
+      const currency = (query.currency || body.currency || 'BOB') as 'BOB' | 'USD';
+      const exchangeRate = Number(query.exchangeRate || body.exchangeRate || 11.86);
 
       const result = await getAssetsUseCase.execute({
         page: 1,
@@ -163,7 +170,11 @@ export class AssetController {
         sortOrder: 'asc',
       });
 
-      const excelBuffer = await generateAssetsExcelReport(result.data, { calculationDate });
+      const excelBuffer = await generateAssetsExcelReport(result.data, {
+        calculationDate,
+        currency,
+        exchangeRate,
+      });
 
       const filename = `Reporte_Activos_Fijos_COMIBOL.xlsx`;
 

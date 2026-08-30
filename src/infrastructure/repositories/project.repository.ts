@@ -55,7 +55,16 @@ export class ProjectRepository implements IProjectRepository {
           _count: {
             select: {
               assetProjects: true,
+              supplyProjects: true,
             },
+          },
+          assetProjects: {
+            where: { releasedAt: null },
+            select: { quantity: true },
+          },
+          supplyProjects: {
+            where: { releasedAt: null },
+            select: { quantity: true },
           },
         },
       }),
@@ -73,7 +82,8 @@ export class ProjectRepository implements IProjectRepository {
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,
       deletedAt: p.deletedAt,
-      totalAssets: p._count.assetProjects,
+      totalAssets: p.assetProjects ? p.assetProjects.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) : (p._count?.assetProjects || 0),
+      totalSupplies: p.supplyProjects ? p.supplyProjects.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) : (p._count?.supplyProjects || 0),
     }));
 
     return {
@@ -105,7 +115,16 @@ export class ProjectRepository implements IProjectRepository {
         _count: {
           select: {
             assetProjects: true,
+            supplyProjects: true,
           },
+        },
+        assetProjects: {
+          where: { releasedAt: null },
+          select: { quantity: true },
+        },
+        supplyProjects: {
+          where: { releasedAt: null },
+          select: { quantity: true },
         },
       },
     });
@@ -124,7 +143,8 @@ export class ProjectRepository implements IProjectRepository {
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,
       deletedAt: p.deletedAt,
-      totalAssets: p._count.assetProjects,
+      totalAssets: p.assetProjects ? p.assetProjects.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) : (p._count?.assetProjects || 0),
+      totalSupplies: p.supplyProjects ? p.supplyProjects.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) : (p._count?.supplyProjects || 0),
     };
   }
 

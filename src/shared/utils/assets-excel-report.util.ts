@@ -5,9 +5,13 @@ import { env } from '../../infrastructure/config/env';
 
 export const generateAssetsExcelReport = async (
   assets: any[],
-  options?: { calculationDate?: string | Date | null },
+  options?: { calculationDate?: string | Date | null; currency?: 'BOB' | 'USD'; exchangeRate?: number },
 ): Promise<Buffer> => {
   const timeZone = env.TZ || process.env.TZ || 'America/La_Paz';
+  const isUSD = options?.currency === 'USD';
+  const rate = options?.exchangeRate && options.exchangeRate > 0 ? options.exchangeRate : 11.86;
+  const currencySymbol = isUSD ? '$' : 'Bs.';
+
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'COMIBOL';
   workbook.created = new Date();
@@ -61,7 +65,8 @@ export const generateAssetsExcelReport = async (
   worksheet.getCell('C2').font = { name: 'Arial', size: 13, bold: true, color: { argb: '334155' } };
   worksheet.getCell('C2').alignment = { vertical: 'middle', horizontal: 'left' };
 
-  worksheet.getCell('C3').value = 'REPORTE DE INVENTARIO DE ACTIVOS FIJOS';
+  const currencyTitleSuffix = isUSD ? ` (Expresado en Dólares - T/C: ${rate})` : ' (Expresado en Bolivianos)';
+  worksheet.getCell('C3').value = `REPORTE DE INVENTARIO DE ACTIVOS FIJOS${currencyTitleSuffix}`;
   worksheet.getCell('C3').font = { name: 'Arial', size: 13, bold: true, color: { argb: '1E3A8A' } };
   worksheet.getCell('C3').alignment = { vertical: 'middle', horizontal: 'left' };
 
@@ -105,10 +110,10 @@ export const generateAssetsExcelReport = async (
     'Disponibles',
     'Unidad',
     'Fecha Adquisición',
-    'Valor Compra (Bs.)',
+    `Valor Compra (${currencySymbol})`,
     'Depreciación (%)',
-    'Dep. Acumulada (Bs.)',
-    'Saldo / Valor Neto (Bs.)',
+    `Dep. Acumulada (${currencySymbol})`,
+    `Saldo / Valor Neto (${currencySymbol})`,
     'Marca',
     'Modelo',
     'N° Serie',
@@ -129,7 +134,7 @@ export const generateAssetsExcelReport = async (
       vertical: 'distributed',
       horizontal: ['N°', 'Cantidad', 'Salidas', 'Disponibles', 'Unidad', 'Fecha Adquisición', 'Depreciación (%)'].includes(text)
         ? 'center'
-        : ['Valor Compra (Bs.)', 'Dep. Acumulada (Bs.)', 'Saldo / Valor Neto (Bs.)'].includes(text)
+        : text.includes('(' + currencySymbol + ')')
           ? 'right'
           : 'left',
       wrapText: true,
@@ -154,9 +159,13 @@ export const generateAssetsExcelReport = async (
       const row = worksheet.getRow(currentRowIdx);
       row.height = 22; // Altura confortable por fila
 
-      const purchaseValue = Number(item.purchaseValue || 0);
-      const depac = Number(item.depac || 0);
-      const balance = Number(item.balance || 0);
+      const rawPVal = Number(item.purchaseValue || 0);
+      const rawDepac = Number(item.depac || 0);
+      const rawBalance = Number(item.balance || 0);
+
+      const purchaseValue = isUSD ? rawPVal / rate : rawPVal;
+      const depac = isUSD ? rawDepac / rate : rawDepac;
+      const balance = isUSD ? rawBalance / rate : rawBalance;
 
       totalValue += purchaseValue;
       totalDepac += depac;
@@ -246,7 +255,7 @@ export const generateAssetsExcelReport = async (
     };
   }
 
-  totalRow.getCell(2).value = 'TOTALES GENERALES';
+  totalRow.getCell(2).value = `TOTALES GENERALES (${currencySymbol})`;
   totalRow.getCell(12).value = totalValue;
   totalRow.getCell(12).numFmt = '#,##0.00';
   totalRow.getCell(12).alignment = { vertical: 'middle', horizontal: 'right' };

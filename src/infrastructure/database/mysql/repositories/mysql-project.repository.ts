@@ -39,7 +39,8 @@ export class MySQLProjectRepository implements IProjectRepository {
 
     const sql = `
       SELECT p.id, p.name, p.address, p.responsible, p.status, p.startDate, p.endDate, p.description, p.createdAt, p.updatedAt, p.deletedAt,
-             (SELECT COALESCE(SUM(quantity), 0) FROM asset_projects ap WHERE ap.projectId = p.id AND ap.releasedAt IS NULL) AS totalAssets
+             (SELECT COALESCE(SUM(quantity), 0) FROM asset_projects ap WHERE ap.projectId = p.id AND ap.releasedAt IS NULL) AS totalAssets,
+             (SELECT COALESCE(SUM(quantity), 0) FROM supply_projects sp WHERE sp.project_id = p.id AND sp.released_at IS NULL) AS totalSupplies
       FROM projects p
       WHERE ${whereClause}
       ORDER BY ${sortBy} ${sortOrder}
@@ -61,6 +62,7 @@ export class MySQLProjectRepository implements IProjectRepository {
       updatedAt: new Date(row.updatedAt),
       deletedAt: row.deletedAt ? new Date(row.deletedAt) : null,
       totalAssets: Number(row.totalAssets || 0),
+      totalSupplies: Number(row.totalSupplies || 0),
     }));
 
     return {
@@ -77,7 +79,8 @@ export class MySQLProjectRepository implements IProjectRepository {
   async findById(id: string): Promise<ProjectWithCount | null> {
     const sql = `
       SELECT p.id, p.name, p.address, p.responsible, p.status, p.startDate, p.endDate, p.description, p.createdAt, p.updatedAt, p.deletedAt,
-             (SELECT COALESCE(SUM(quantity), 0) FROM asset_projects ap WHERE ap.projectId = p.id AND ap.releasedAt IS NULL) AS totalAssets
+             (SELECT COALESCE(SUM(quantity), 0) FROM asset_projects ap WHERE ap.projectId = p.id AND ap.releasedAt IS NULL) AS totalAssets,
+             (SELECT COALESCE(SUM(quantity), 0) FROM supply_projects sp WHERE sp.project_id = p.id AND sp.released_at IS NULL) AS totalSupplies
       FROM projects p
       WHERE p.id = ? AND p.deletedAt IS NULL
       LIMIT 1
@@ -100,6 +103,7 @@ export class MySQLProjectRepository implements IProjectRepository {
       updatedAt: new Date(row.updatedAt),
       deletedAt: row.deletedAt ? new Date(row.deletedAt) : null,
       totalAssets: Number(row.totalAssets || 0),
+      totalSupplies: Number(row.totalSupplies || 0),
     };
   }
 

@@ -127,7 +127,7 @@ export class AssetRepository implements IAssetRepository {
     };
   }
 
-  async findById(id: string): Promise<AssetDetail | null> {
+  async findById(id: string, calculationDate?: string): Promise<AssetDetail | null> {
     const asset = await prisma.asset.findFirst({
       where: { id, deletedAt: null },
       include: {
@@ -141,7 +141,7 @@ export class AssetRepository implements IAssetRepository {
 
     const pVal = asset.purchaseValue ? Number(asset.purchaseValue) : 0;
     const uLife = asset.category?.usefulLife ?? 0;
-    const fin = calculateFinancials(pVal, asset.purchaseDate, uLife);
+    const fin = calculateFinancials(pVal, asset.purchaseDate, uLife, calculationDate);
 
     return {
       ...asset,

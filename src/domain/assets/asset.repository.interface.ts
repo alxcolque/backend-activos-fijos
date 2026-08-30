@@ -102,7 +102,7 @@ export interface UpdateAssetDto {
 
 export interface IAssetRepository {
   findAll(options: FindAllAssetsOptions): Promise<PaginatedAssets>;
-  findById(id: string): Promise<AssetDetail | null>;
+  findById(id: string, calculationDate?: string): Promise<AssetDetail | null>;
   findRawById(id: string): Promise<Asset | null>;
   findByCode(code: string): Promise<AssetDetail | null>;
   findByQr(qrCode: string): Promise<AssetDetail | null>;

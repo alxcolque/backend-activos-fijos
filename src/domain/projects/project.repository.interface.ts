@@ -3,6 +3,7 @@ import { ProjectStatus } from '../enums/project-status.enum';
 
 export interface ProjectWithCount extends Project {
   totalAssets?: number;
+  totalSupplies?: number;
 }
 
 export interface FindAllProjectsOptions {
