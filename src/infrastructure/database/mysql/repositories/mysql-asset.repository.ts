@@ -95,10 +95,10 @@ export class MySQLAssetRepository implements IAssetRepository {
       LEFT JOIN locations l ON l.id = a.locationId
       WHERE ${whereClause}
       ORDER BY ${sortBy} ${sortOrder}
-      LIMIT ? OFFSET ?
+      LIMIT ${limit} OFFSET ${offset}
     `;
 
-    const [rows] = await mysqlPool.execute<RowDataPacket[]>(sql, [...params, limit, offset]);
+    const [rows] = await mysqlPool.query<RowDataPacket[]>(sql, params);
 
     const formattedData: AssetListItem[] = rows.map((row) => {
       const pVal = row.purchaseValue ? Number(row.purchaseValue) : 0;

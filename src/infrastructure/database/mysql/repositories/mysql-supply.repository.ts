@@ -51,10 +51,10 @@ export class MySQLSupplyRepository implements ISupplyRepository {
       LEFT JOIN locations l ON l.id = s.location_id
       ${whereClause}
       ORDER BY s.created_at DESC
-      LIMIT ? OFFSET ?
+      LIMIT ${limit} OFFSET ${offset}
     `;
 
-    const [rows] = await mysqlPool.execute<RowDataPacket[]>(sql, [...params, limit, offset]);
+    const [rows] = await mysqlPool.query<RowDataPacket[]>(sql, params);
 
     const data: SupplyEntity[] = rows.map((r: any) => ({
       id: r.id,

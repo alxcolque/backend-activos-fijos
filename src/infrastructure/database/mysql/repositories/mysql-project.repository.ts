@@ -44,10 +44,10 @@ export class MySQLProjectRepository implements IProjectRepository {
       FROM projects p
       WHERE ${whereClause}
       ORDER BY ${sortBy} ${sortOrder}
-      LIMIT ? OFFSET ?
+      LIMIT ${limit} OFFSET ${offset}
     `;
 
-    const [rows] = await mysqlPool.execute<RowDataPacket[]>(sql, [...params, limit, offset]);
+    const [rows] = await mysqlPool.query<RowDataPacket[]>(sql, params);
 
     const data: ProjectWithCount[] = rows.map((row) => ({
       id: row.id,

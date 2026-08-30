@@ -19,8 +19,8 @@ export class MySQLLocationRepository implements ILocationRepository {
     const params: any[] = [];
 
     if (options.search) {
-      whereConditions.push('(l.name LIKE ? OR l.description LIKE ?)');
-      params.push(`%${options.search}%`, `%${options.search}%`);
+      whereConditions.push('(l.name LIKE ? OR l.code LIKE ? OR l.description LIKE ?)');
+      params.push(`%${options.search}%`, `%${options.search}%`, `%${options.search}%`);
     }
 
     const whereClause = whereConditions.join(' AND ');
@@ -28,20 +28,20 @@ export class MySQLLocationRepository implements ILocationRepository {
     const sortOrder = options.sortOrder?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
     const countSql = `SELECT COUNT(*) as total FROM locations l WHERE ${whereClause}`;
-    const [countRows] = await mysqlPool.execute<RowDataPacket[]>(countSql, params);
+    const [countRows] = await mysqlPool.query<RowDataPacket[]>(countSql, params);
     const total = Number(countRows[0]?.total || 0);
 
     const sql = `
-      SELECT l.id, l.parentId, l.name, l.description, l.createdAt, l.updatedAt, l.deletedAt,
+      SELECT l.id, l.parent_id AS parentId, l.name, l.description, l.createdAt, l.updatedAt, l.deletedAt,
              (SELECT COUNT(*) FROM assets a WHERE a.locationId = l.id AND a.deletedAt IS NULL) AS totalAssets,
-             (SELECT COUNT(*) FROM locations c WHERE c.parentId = l.id AND c.deletedAt IS NULL) AS totalChildren
+             (SELECT COUNT(*) FROM locations c WHERE c.parent_id = l.id AND c.deletedAt IS NULL) AS totalChildren
       FROM locations l
       WHERE ${whereClause}
       ORDER BY ${sortBy} ${sortOrder}
-      LIMIT ? OFFSET ?
+      LIMIT ${limit} OFFSET ${offset}
     `;
 
-    const [rows] = await mysqlPool.execute<RowDataPacket[]>(sql, [...params, limit, offset]);
+    const [rows] = await mysqlPool.query<RowDataPacket[]>(sql, params);
 
     const data: LocationWithCount[] = rows.map((row) => ({
       id: row.id,
@@ -68,9 +68,9 @@ export class MySQLLocationRepository implements ILocationRepository {
 
   async findById(id: string): Promise<LocationWithCount | null> {
     const sql = `
-      SELECT l.id, l.parentId, l.name, l.description, l.createdAt, l.updatedAt, l.deletedAt,
+      SELECT l.id, l.parent_id AS parentId, l.name, l.description, l.createdAt, l.updatedAt, l.deletedAt,
              (SELECT COUNT(*) FROM assets a WHERE a.locationId = l.id AND a.deletedAt IS NULL) AS totalAssets,
-             (SELECT COUNT(*) FROM locations c WHERE c.parentId = l.id AND c.deletedAt IS NULL) AS totalChildren
+             (SELECT COUNT(*) FROM locations c WHERE c.parent_id = l.id AND c.deletedAt IS NULL) AS totalChildren
       FROM locations l
       WHERE l.id = ? AND l.deletedAt IS NULL
       LIMIT 1
@@ -95,7 +95,7 @@ export class MySQLLocationRepository implements ILocationRepository {
 
   async findRawById(id: string): Promise<Location | null> {
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(
-      'SELECT id, parentId, name, description, createdAt, updatedAt, deletedAt FROM locations WHERE id = ? AND deletedAt IS NULL LIMIT 1',
+      'SELECT id, parent_id AS parentId, name, description, createdAt, updatedAt, deletedAt FROM locations WHERE id = ? AND deletedAt IS NULL LIMIT 1',
       [id],
     );
 
@@ -113,14 +113,14 @@ export class MySQLLocationRepository implements ILocationRepository {
   }
 
   async findByNameAndParent(name: string, parentId: string | null): Promise<Location | null> {
-    let sql = 'SELECT id, parentId, name, description, createdAt, updatedAt, deletedAt FROM locations WHERE name = ? AND deletedAt IS NULL';
+    let sql = 'SELECT id, parent_id AS parentId, name, description, createdAt, updatedAt, deletedAt FROM locations WHERE name = ? AND deletedAt IS NULL';
     const params: any[] = [name];
 
     if (parentId) {
-      sql += ' AND parentId = ?';
+      sql += ' AND parent_id = ?';
       params.push(parentId);
     } else {
-      sql += ' AND parentId IS NULL';
+      sql += ' AND parent_id IS NULL';
     }
 
     sql += ' LIMIT 1';
@@ -142,7 +142,7 @@ export class MySQLLocationRepository implements ILocationRepository {
 
   async findAllRaw(): Promise<Location[]> {
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(
-      'SELECT id, parentId, name, description, createdAt, updatedAt, deletedAt FROM locations WHERE deletedAt IS NULL ORDER BY name ASC',
+      'SELECT id, parent_id AS parentId, name, description, createdAt, updatedAt, deletedAt FROM locations WHERE deletedAt IS NULL ORDER BY name ASC',
     );
 
     return rows.map((row) => ({
@@ -163,7 +163,7 @@ export class MySQLLocationRepository implements ILocationRepository {
     const description = data.description || null;
 
     await mysqlPool.execute(
-      'INSERT INTO locations (id, parentId, name, description, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)',
+      'INSERT INTO locations (id, parent_id, name, description, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)',
       [id, parentId, data.name, description, now, now],
     );
 
@@ -187,7 +187,7 @@ export class MySQLLocationRepository implements ILocationRepository {
     const params: any[] = [now];
 
     if (data.parentId !== undefined) {
-      updates.push('parentId = ?');
+      updates.push('parent_id = ?');
       params.push(data.parentId || null);
     }
     if (data.name !== undefined) {
@@ -223,7 +223,7 @@ export class MySQLLocationRepository implements ILocationRepository {
 
   async existsChildren(id: string): Promise<boolean> {
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(
-      'SELECT COUNT(*) as total FROM locations WHERE parentId = ? AND deletedAt IS NULL',
+      'SELECT COUNT(*) as total FROM locations WHERE parent_id = ? AND deletedAt IS NULL',
       [id],
     );
     return Number(rows[0]?.total || 0) > 0;

@@ -94,7 +94,7 @@ export class MySQLAcquisitionRepository implements IAcquisitionRepository {
 
     const whereClause = whereConditions.join(' AND ');
 
-    const [countRows] = await mysqlPool.execute<RowDataPacket[]>(
+    const [countRows] = await mysqlPool.query<RowDataPacket[]>(
       `SELECT COUNT(*) as total FROM acquisitions a
        LEFT JOIN users u ON u.id = a.user_id
        LEFT JOIN projects p ON p.id = a.project_id
@@ -106,7 +106,7 @@ export class MySQLAcquisitionRepository implements IAcquisitionRepository {
 
     const sortOrder = options.sortOrder === 'asc' ? 'ASC' : 'DESC';
 
-    const [rows] = await mysqlPool.execute<RowDataPacket[]>(
+    const [rows] = await mysqlPool.query<RowDataPacket[]>(
       `SELECT a.id, a.user_id, a.project_id, a.checkout_user_id, a.departure_date, a.type, a.created_at, a.updated_at,
               u.fullName as userName, u.email as userEmail, u.profession as userProfession,
               p.name as projectName,
@@ -117,8 +117,8 @@ export class MySQLAcquisitionRepository implements IAcquisitionRepository {
        LEFT JOIN users cu ON cu.id = a.checkout_user_id
        WHERE ${whereClause}
        ORDER BY a.created_at ${sortOrder}
-       LIMIT ? OFFSET ?`,
-      [...params, limit, offset],
+       LIMIT ${limit} OFFSET ${offset}`,
+      params,
     );
 
     const acquisitionIds = rows.map((r: any) => r.id);

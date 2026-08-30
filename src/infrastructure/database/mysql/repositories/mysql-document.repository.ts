@@ -59,7 +59,7 @@ export class MySQLDocumentRepository implements IDocumentRepository {
       LEFT JOIN assets a ON a.id = d.assetId
       ${whereClause}
     `;
-    const [countRows] = await mysqlPool.execute<RowDataPacket[]>(countSql, params);
+    const [countRows] = await mysqlPool.query<RowDataPacket[]>(countSql, params);
     const total = Number(countRows[0]?.total || 0);
 
     const sql = `
@@ -68,10 +68,10 @@ export class MySQLDocumentRepository implements IDocumentRepository {
       LEFT JOIN assets a ON a.id = d.assetId
       ${whereClause}
       ORDER BY d.createdAt DESC
-      LIMIT ? OFFSET ?
+      LIMIT ${limit} OFFSET ${offset}
     `;
 
-    const [rows] = await mysqlPool.execute<RowDataPacket[]>(sql, [...params, limit, offset]);
+    const [rows] = await mysqlPool.query<RowDataPacket[]>(sql, params);
 
     const data: AssetDocumentDetail[] = rows.map((row) => ({
       ...this.mapRow(row),

@@ -24,18 +24,18 @@ export class MySQLUserRepository implements IUserRepository {
 
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
-    const [countRows] = await mysqlPool.execute<RowDataPacket[]>(
+    const [countRows] = await mysqlPool.query<RowDataPacket[]>(
       `SELECT COUNT(*) as total FROM users u ${whereClause}`,
       params,
     );
     const total = Number(countRows[0]?.total || 0);
 
-    const [rows] = await mysqlPool.execute<RowDataPacket[]>(
+    const [rows] = await mysqlPool.query<RowDataPacket[]>(
       `SELECT u.id, u.email, u.fullName, u.profession, u.project_id, u.role, u.isActive, u.lastLogin, u.createdAt, u.updatedAt, p.name as project_name
        FROM users u
        LEFT JOIN projects p ON p.id = u.project_id
-       ${whereClause} ORDER BY u.createdAt DESC LIMIT ? OFFSET ?`,
-      [...params, limit, offset],
+       ${whereClause} ORDER BY u.createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
+      params,
     );
 
     const data: UserEntity[] = rows.map((r: any) => ({

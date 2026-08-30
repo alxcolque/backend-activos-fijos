@@ -61,10 +61,10 @@ export class MySQLAssetProjectRepository implements IAssetProjectRepository {
       LEFT JOIN projects p ON p.id = ap.projectId
       ${whereClause}
       ORDER BY ap.assignedAt DESC
-      LIMIT ? OFFSET ?
+      LIMIT ${limit} OFFSET ${offset}
     `;
 
-    const [rows] = await mysqlPool.execute<RowDataPacket[]>(sql, [...params, limit, offset]);
+    const [rows] = await mysqlPool.query<RowDataPacket[]>(sql, params);
 
     const data: AssetProjectDetail[] = rows.map((row) => ({
       id: row.id,

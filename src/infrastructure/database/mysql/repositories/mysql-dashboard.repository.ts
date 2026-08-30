@@ -111,9 +111,8 @@ export class MySQLDashboardRepository implements IDashboardRepository {
   }
 
   async getRecentAssets(limit = 10): Promise<RecentAsset[]> {
-    const [rows] = await mysqlPool.execute<RowDataPacket[]>(
-      'SELECT id, code, name, createdAt FROM assets WHERE deletedAt IS NULL ORDER BY createdAt DESC LIMIT ?',
-      [limit],
+    const [rows] = await mysqlPool.query<RowDataPacket[]>(
+      `SELECT id, code, name, createdAt FROM assets WHERE deletedAt IS NULL ORDER BY createdAt DESC LIMIT ${Number(limit)}`,
     );
 
     return rows.map((r) => ({
@@ -125,9 +124,8 @@ export class MySQLDashboardRepository implements IDashboardRepository {
   }
 
   async getRecentActivities(limit = 10): Promise<RecentActivity[]> {
-    const [rows] = await mysqlPool.execute<RowDataPacket[]>(
-      'SELECT code, name, updatedAt FROM assets WHERE deletedAt IS NULL ORDER BY updatedAt DESC LIMIT ?',
-      [limit],
+    const [rows] = await mysqlPool.query<RowDataPacket[]>(
+      `SELECT code, name, updatedAt FROM assets WHERE deletedAt IS NULL ORDER BY updatedAt DESC LIMIT ${Number(limit)}`,
     );
 
     return rows.map((r) => ({
