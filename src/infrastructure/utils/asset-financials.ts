@@ -84,10 +84,20 @@ function extractDateParts(
   }
 
   if (isAcquisitionDate) {
-    // Asset acquisition dates are always set to the 1st of the same month for calculations (e.g., 31/08/2023 -> 01/08/2023)
-    day = 1;
+    // Condición 1: Si el día de la fecha es menor o igual a 30 -> cambiar el día a 1 del mismo mes.
+    // Condición 2: Si el día del mes es 31 -> pasa a 1 del siguiente mes.
+    if (day <= 30) {
+      day = 1;
+    } else if (day === 31) {
+      day = 1;
+      month += 1;
+      if (month > 11) {
+        month = 0;
+        year += 1;
+      }
+    }
   } else {
-    // Commercial 360-day rule for calculation cut-off date: Day 31 of any month equals Day 1 of the following month
+    // Regla comercial 360 días para fecha de corte/cálculo: si el día es 31 pasa a 1 del siguiente mes
     if (day === 31) {
       day = 1;
       month += 1;
@@ -104,7 +114,7 @@ function extractDateParts(
 /**
  * Calculates elapsed days between two dates using the 30/360 commercial convention (360 days/year, 30 days/month).
  * 
- * @param startDate - Acquisition date of the asset (adjusted to day 1 of the acquisition month).
+ * @param startDate - Acquisition date of the asset.
  * @param endDate - Calculation / cut-off date (defaults to current date).
  * @returns Number of elapsed commercial days (>= 0).
  */
@@ -132,11 +142,12 @@ export const dias360 = days360;
 
 /**
  * Calculates depreciation rate (%), accumulated depreciation (Bs.), and net book value / balance (Bs.) for a fixed asset.
+ * Todo se obtiene estrictamente de los valores pasados de la BD sin asumir valores por defecto.
  * 
- * @param purchaseValueInput - Initial purchase/acquisition value of the asset.
- * @param purchaseDateInput - Date when the asset was purchased.
- * @param usefulLifeInput - Useful life of the asset in years.
- * @param currentDateInput - Evaluation date (defaults to current date).
+ * @param purchaseValueInput - Initial purchase/acquisition value of the asset from DB.
+ * @param purchaseDateInput - Date when the asset was purchased from DB.
+ * @param usefulLifeInput - Useful life of the asset in years from DB category.
+ * @param currentDateInput - Evaluation date (defaults to current date if cut-off date is requested).
  * @returns Object containing annual depreciation percentage (`dep`), accumulated depreciation (`depac`), and net balance (`balance`).
  */
 export function calculateFinancials(
@@ -146,28 +157,46 @@ export function calculateFinancials(
   currentDateInput?: Date | string | null,
 ): FinancialCalculationResult {
   const purchaseValue = Number(purchaseValueInput || 0);
+  const usefulLifeYears = Number(usefulLifeInput || 0);
+
+  // Manejo de errores: Si el valor de compra es inválido o negativo
   if (isNaN(purchaseValue) || purchaseValue < 0) {
-    console.error(`[Financial Error] Invalid purchase value: ${purchaseValueInput}`);
+    console.error(`[Financial Error] Valor de compra inválido: ${purchaseValueInput}`);
   }
 
-  const usefulLifeYears = Number(usefulLifeInput || 0) > 0 ? Number(usefulLifeInput) : 5;
-  if (!usefulLifeInput || usefulLifeInput <= 0) {
-    console.warn(`[Financial Warning] Invalid or missing useful life (${usefulLifeInput}), defaulting to standard 5 years.`);
+  // Manejo de errores: Si la vida útil de la BD es <= 0 o inválida, NO se asume ningún valor por defecto (como 5 años)
+  if (isNaN(usefulLifeYears) || usefulLifeYears <= 0) {
+    console.error(`[Financial Error] Vida útil no válida o ausente en la base de datos (${usefulLifeInput}). Imposible depreciar sin vida útil configurada.`);
+    return {
+      dep: 0,
+      depac: 0,
+      balance: Math.max(0, isNaN(purchaseValue) ? 0 : purchaseValue),
+    };
   }
 
   const dailyDepreciationRate = 100 / (usefulLifeYears * ASSET_YEAR);
-  const annualDepreciationRate = (100 / (ASSET_YEAR * usefulLifeYears)) * ASSET_YEAR;
-  const elapsedDays = purchaseDateInput ? days360(purchaseDateInput, currentDateInput || new Date()) : 0;
+  const annualDepreciationRate = 100 / usefulLifeYears;
+
+  let elapsedDays = 0;
+  if (purchaseDateInput) {
+    try {
+      elapsedDays = days360(purchaseDateInput, currentDateInput);
+    } catch (err: any) {
+      console.error(`[Financial Error] Error al procesar fecha de compra: ${purchaseDateInput}`, err?.message);
+      elapsedDays = 0;
+    }
+  }
+
   const elapsedYears = elapsedDays / ASSET_YEAR;
 
   let accumulatedDepreciation = 0;
   if (purchaseValue > 0) {
     if (elapsedYears >= usefulLifeYears) {
-      // Retain minimum residual value of 1 Bs. once fully depreciated
-      accumulatedDepreciation = purchaseValue - 1;
+      // Retener valor residual mínimo de 1 Bs. al estar totalmente depreciado
+      accumulatedDepreciation = Math.max(0, purchaseValue - 1);
     } else {
       accumulatedDepreciation = Math.min(
-        purchaseValue - 1,
+        Math.max(0, purchaseValue - 1),
         ((dailyDepreciationRate * purchaseValue) / 100) * elapsedDays,
       );
     }
