@@ -177,7 +177,19 @@ export class AssetController {
         sortOrder: 'asc',
       });
 
-      const excelBuffer = await generateAssetsExcelReport(result.data, {
+      // Ordenar prioritariamente por Categoría (A-Z) y secundariamente por Código de Activo
+      const sortedAssets = [...(result.data || [])].sort((a, b) => {
+        const catA = (a.category?.name || 'Sin Categoría').trim().toLowerCase();
+        const catB = (b.category?.name || 'Sin Categoría').trim().toLowerCase();
+        const catComparison = catA.localeCompare(catB, 'es', { numeric: true });
+        if (catComparison !== 0) return catComparison;
+
+        const codeA = (a.code || '').trim().toLowerCase();
+        const codeB = (b.code || '').trim().toLowerCase();
+        return codeA.localeCompare(codeB, 'es', { numeric: true });
+      });
+
+      const excelBuffer = await generateAssetsExcelReport(sortedAssets, {
         calculationDate,
         currency,
         exchangeRate,

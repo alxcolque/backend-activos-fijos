@@ -147,17 +147,29 @@ export const generateAssetsExcelReport = async (
     };
   });
 
-  // 4. Filas de Datos
+  // 4. Filas de Datos (Ordenadas prioritariamente por Categoría alfabéticamente A-Z, y luego por Código)
   let totalValue = 0;
   let totalDepac = 0;
   let totalBalance = 0;
 
   let currentRowIdx = 7;
 
-  if (Array.isArray(assets)) {
-    assets.forEach((item, index) => {
-      const row = worksheet.getRow(currentRowIdx);
-      row.height = 22; // Altura confortable por fila
+  const sortedAssets = Array.isArray(assets)
+    ? [...assets].sort((a, b) => {
+        const catA = (a.category?.name || 'Sin Categoría').trim().toLowerCase();
+        const catB = (b.category?.name || 'Sin Categoría').trim().toLowerCase();
+        const catComparison = catA.localeCompare(catB, 'es', { numeric: true });
+        if (catComparison !== 0) return catComparison;
+
+        const codeA = (a.code || '').trim().toLowerCase();
+        const codeB = (b.code || '').trim().toLowerCase();
+        return codeA.localeCompare(codeB, 'es', { numeric: true });
+      })
+    : [];
+
+  sortedAssets.forEach((item, index) => {
+    const row = worksheet.getRow(currentRowIdx);
+    row.height = 22; // Altura confortable por fila
 
       const rawPVal = Number(item.purchaseValue || 0);
       const rawDepac = Number(item.depac || 0);
@@ -235,7 +247,6 @@ export const generateAssetsExcelReport = async (
 
       currentRowIdx++;
     });
-  }
 
   // 5. Fila de Totales Generales
   const totalRow = worksheet.getRow(currentRowIdx);
