@@ -15,6 +15,7 @@ export interface SupplyProjectEntity {
     unit: string;
     categoryId?: string | null;
     locationId?: string | null;
+    observations?: string | null;
     category?: { id: string; name: string } | null;
     location?: { id: string; name: string } | null;
   } | null;

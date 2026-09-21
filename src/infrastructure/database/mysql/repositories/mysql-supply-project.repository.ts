@@ -13,7 +13,7 @@ export class MySQLSupplyProjectRepository implements ISupplyProjectRepository {
     const sql = `
       SELECT sp.id, sp.supply_id, sp.project_id, sp.quantity, sp.output_quantity, sp.assigned_at, sp.released_at,
              sp.observations, sp.created_at, sp.updated_at,
-             s.name AS supply_name, s.unit AS supply_unit, s.category_id, s.location_id,
+             s.name AS supply_name, s.unit AS supply_unit, s.category_id, s.location_id, s.observations AS supply_observations,
              c.name AS category_name, l.name AS location_name,
              p.name AS project_name
       FROM supply_projects sp
@@ -43,6 +43,7 @@ export class MySQLSupplyProjectRepository implements ISupplyProjectRepository {
         unit: r.supply_unit || 'PZA',
         categoryId: r.category_id || null,
         locationId: r.location_id || null,
+        observations: r.supply_observations || null,
         category: r.category_id ? { id: r.category_id, name: r.category_name } : null,
         location: r.location_id ? { id: r.location_id, name: r.location_name } : null,
       },
@@ -57,7 +58,7 @@ export class MySQLSupplyProjectRepository implements ISupplyProjectRepository {
     const sql = `
       SELECT sp.id, sp.supply_id, sp.project_id, sp.quantity, sp.output_quantity, sp.assigned_at, sp.released_at,
              sp.observations, sp.created_at, sp.updated_at,
-             s.name AS supply_name, s.unit AS supply_unit, s.category_id, s.location_id,
+             s.name AS supply_name, s.unit AS supply_unit, s.category_id, s.location_id, s.observations AS supply_observations,
              c.name AS category_name, l.name AS location_name,
              p.name AS project_name
       FROM supply_projects sp
@@ -88,6 +89,7 @@ export class MySQLSupplyProjectRepository implements ISupplyProjectRepository {
         unit: r.supply_unit || 'PZA',
         categoryId: r.category_id || null,
         locationId: r.location_id || null,
+        observations: r.supply_observations || null,
         category: r.category_id ? { id: r.category_id, name: r.category_name } : null,
         location: r.location_id ? { id: r.location_id, name: r.location_name } : null,
       },
